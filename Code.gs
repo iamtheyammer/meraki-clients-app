@@ -1,8 +1,15 @@
-//10:02AM 1/12/18
+//9:30PM 1/12/18
 function onOpen(e) { //The 'e' there tells the system that this doesn't work in certain authentication modes. Something to look into, but not a priority.
-  SpreadsheetApp.getUi().createAddonMenu() //Tells the UI to add a space to put items under the mTools add-ons menu in docs
+  var ui = SpreadsheetApp.getUi();
+  SpreadsheetApp.getUi().createMenu('MerakiApp') //Tells the UI to add a space to put items under the mTools add-ons menu in docs
       .addItem('Start', 'connectToMeraki') //Adds 'Start', the visible text. 'websiter' is the function we're calling.
       .addItem('Reset sheet', 'resetSheet')
+      .addSeparator()
+      .addSubMenu(ui.createMenu('Advanced')
+          .addItem('Completely clear sheet', 'completelyClearSheet')
+          .addItem('Print organizations', 'printOrganizations')
+          .addItem('Print networks', 'printNetworks')
+          .addItem('Custom API call', 'customAPICall'))
       .addToUi(); //Completes the add call.
 }
 
@@ -52,11 +59,4 @@ function connectToMeraki() {
  
   */
 }
-
-function test() {
-  var ui = SpreadsheetApp.getUi();
-  var response = ui.prompt('test', 'test', 'test', ui.ButtonSet.OK_CANCEL);
-}
-
-
 //curl -L -H 'X-Cisco-Meraki-API-Key: 38058ca4c95b21ae6b4c568e19d280bc9bc5495d' -X GET -H 'Content-Type: application/json' 'https://api.meraki.com/api/v0/devices/02:02:00:47:62:a9/clients?timespan=86400'

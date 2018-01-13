@@ -1,4 +1,4 @@
-//10:02AM 1/12/18
+//9:20PM 1/12/18
 /* This is the discreetFunctions code sheet. It's for functions that take in and put out data, like small processors. It's not for the main code flow. */
 
 function apiCall(url, apikey) {
@@ -74,3 +74,32 @@ function resetSheet() {
   cell.setValue('Networks:')
 
 }
+
+/* Using the resetSheet function:
+This function is called directly from the menu, so nothing comes in and nothing is returned. It can also be called from inside of the code. */
+
+function switchSheets(sheetName) {
+ var newSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+ if (newSheet == null || newSheet == undefined) {
+   SpreadsheetApp.getActiveSpreadsheet().insertSheet(sheetName);
+ }
+  Logger.log(newSheet)
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+  newSheet.activate();
+  return newSheet;
+  //newSheet.activate();
+}
+
+/* Using the switchSheets function:
+This function makes a new sheet or switches to a sheet with a name you pass in via memberwise initalizer. If there's no sheet with the name you specify, it will
+create a new sheet. It will return the current sheet object, so use a statement like:
+var sheet = switchSheets('sheetName');
+to make sure that you get the active sheet object. then, you'll be able to do operations like:
+sheet.clear();
+*/
+
+function completelyClearSheet() {
+ SpreadsheetApp.getActiveSheet().clear();
+}
+/* Using the completelyClearSheet() function:
+You'll probably never need to use this because you can just sheet.clear();. It's just for the advanced functions menu. */
