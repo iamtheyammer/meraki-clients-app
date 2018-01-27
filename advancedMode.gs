@@ -1,53 +1,62 @@
-//9:20PM 1/12/18
+//9:33PM, 1/26/18
 function printOrganizations() {
 
-  switchSheets("Advanced output");
+  
   
   var sheet = SpreadsheetApp.getActiveSheet();
   var ui = SpreadsheetApp.getUi();
   var cell;
   var range;
+  var userData = getUserInfo();
   
+  var apikey = userData.apikey;
+  if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;}
   
-  var response = ui.prompt('What is your API key?', ui.ButtonSet.OK_CANCEL);
-  if (response.getSelectedButton() !== ui.Button.OK) {
-   ui.alert('The user chose to close the dialog.'); 
-   return;
-  }
-  var apikey = response.getResponseText();
-  
-
+  switchSheets("Advanced output");
+  sheet.clear();
   var userOrganizations = apiCall('https://api.meraki.com/api/v0/organizations/', apikey);
   
-  range = sheet.getRange("A1");
+  range = sheet.getRange("A1:B1");
   cell = sheet.setActiveRange(range);
-  cell.setValue(['Printing User Organizations:'])
-  range = sheet.getRange("A2")
-  cell = sheet.setActiveRange(range)
-  cell.setValue([userOrganizations.stringResponse])
+  cell.setValues([['Name', 'Organization ID']]);
+  
+  var numberOfOrganizations = userOrganizations.jsonResponse.length;
+  
+  for (var i = 0; i < numberOfOrganizations; i++) {
+    range = sheet.getRange("A" + (i+2) + ":B" + (i+2));
+    cell = sheet.setActiveRange(range);
+    cell.setValues([[userOrganizations.jsonResponse[i].name, userOrganizations.jsonResponse[i].id]]);
+  }
 }
   
 function printNetworks() {
   
-  switchSheets('Advanced output');
+  
   
   var sheet = SpreadsheetApp.getActiveSheet();
   var ui = SpreadsheetApp.getUi();
   var cell;
+  var range;
+  var userData = getUserInfo();
   
-  verifyInfoWithUser('You\'ll need your API key and your organization ID. Make sure they\'re available.', 'Maybe they\'re not available. Try again when you\'re ready.');
+  var apikey = userData.apikey;
+  if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;}
   
-  var response = ui.prompt('What is your API key?', ui.ButtonSet.OK_CANCEL);
-  var apikey = response.getResponseText();
+  var organizationId = userData.organizationId;
+  if (organizationId.length <= 1) {ui.alert('Your Organization ID is missing or too short.'); return;}
   
-  var response = ui.prompt('What is your organization ID?', 'Don\'t know? Add-ons -> Advanced -> Print organizations', ui.ButtonSet.OK_CANCEL);
-  var merakiOrganizationId = response.getResponseText();
+  switchSheets('Advanced output');
+  sheet.clear();
   
-  var networkList = apiCall('https://api.meraki.com/api/v0/organizations/' + merakiOrganizationId + '/networks' , apikey);
+  var networkList = apiCall('https://api.meraki.com/api/v0/organizations/' + organizationId + '/networks', apikey);
   var numberOfNetworks = networkList.jsonResponse.length;
   
+  range = sheet.getRange("A1:B1");
+  cell = sheet.setActiveRange(range);
+  cell.setValues([['Name', 'Network ID']]);
+  
   for (var i = 0; i < numberOfNetworks; i++) {
-    range = sheet.getRange("D" + (i+2) + ":E" + (i+2));
+    range = sheet.getRange("A" + (i+2) + ":B" + (i+2));
     cell = sheet.setActiveRange(range);
     cell.setValues([[networkList.jsonResponse[i].name, networkList.jsonResponse[i].id]]);
   }
@@ -56,12 +65,10 @@ function printNetworks() {
 function customAPICall() {
  
   var ui = SpreadsheetApp.getUi();
-  var response = ui.prompt('What is your API key?', ui.ButtonSet.OK_CANCEL);
-  if (response.getSelectedButton() !== ui.Button.OK) {
-   ui.alert('The user chose to close the dialog.'); 
-   return;
-  }
-  var apikey = response.getResponseText();
+  var userData = getUserInfo();
+  
+  var apikey = userData.apikey;
+  if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;}
   
   var response = ui.prompt('What is the URL you want to fetch?', 'Enter the entire URL, including https:// and the domain.', ui.ButtonSet.OK_CANCEL);
   if (response.getSelectedButton() !== ui.Button.OK) {

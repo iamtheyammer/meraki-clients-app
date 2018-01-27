@@ -1,4 +1,4 @@
-//9:20PM 1/12/18
+//9:33PM, 1/26/18
 /* This is the discreetFunctions code sheet. It's for functions that take in and put out data, like small processors. It's not for the main code flow. */
 
 function apiCall(url, apikey) {
