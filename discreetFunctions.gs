@@ -1,14 +1,29 @@
-//9:33PM, 1/26/18
+//8:45AM, 1/27/18
 /* This is the discreetFunctions code sheet. It's for functions that take in and put out data, like small processors. It's not for the main code flow. */
 
 function apiCall(url, apikey) {
-  var APIheaders = {'X-Cisco-Meraki-API-Key': apikey};
+  Logger.log('Attempting an API call to ' + url + '.');
+  var APIheaders = {'X-Cisco-Meraki-API-Key': apikey}; //sets headers
   var options = {'contentType':'application/json', 'method':'GET', 'headers':APIheaders};
-  var response = UrlFetchApp.fetch(url, options);
+  var response = UrlFetchApp.fetch(url, options); //actual api call
+  Logger.log('API call succeeded. Parsing responses.');
   var stringResponse = response.getContentText();
-  var jsonResponse = JSON.parse(stringResponse);
+  var jsonResponse = JSON.parse(stringResponse); //parses response as json
+  Logger.log('Completed API call to ' + url + '.');
   return {'jsonResponse':jsonResponse, 'stringResponse':stringResponse};
 }
+
+function apiCallPut(url, apikey) {
+  Logger.log('Attempting an API call to ' + url + '.');
+  var APIheaders = {'X-Cisco-Meraki-API-Key': apikey}; //sets headers
+  var options = {'contentType':'application/json', 'method':'put', 'headers':APIheaders};
+  var response = UrlFetchApp.fetch(url, options); //actual api call
+  Logger.log('API call succeeded. Parsing responses.');
+  var stringResponse = response.getContentText();
+  var jsonResponse = JSON.parse(stringResponse); //parses response as json
+  Logger.log('Completed API call to ' + url + '.');
+  return {'jsonResponse':jsonResponse, 'stringResponse':stringResponse};
+} //The only difference between the top and bottom functions is that apiCallPut is a PUT request whereas apiCall is a GET request.
 
 /* Using the apiCall function:
 the apiCall function is made so that you don't have to continuously copy and paste the code. Just set your API Key as a variable, and set your URL depending on what you need,
@@ -29,18 +44,43 @@ function testAPICall() {
   
 } */
 
-function getUserInfo(apikey) {
+function getUserInfo() {
   //find user organization
-  var api = apiCall('https://api.meraki.com/api/v0/organizations/', apikey);
-  temp = api.stringResponse;
-  var userOrganization = temp.slice(7, 25);
-  //find user name
-  var userName = api.jsonResponse[0].name;
+  switchSheets('User data');
+  Logger.log('Fetching user data from it\'s sheet...');
   
-  return {'userOrganization':userOrganization,'userName':userName}; 
+  var range = SpreadsheetApp.getActiveSheet().getRange('A2'); //grabs API Key
+  var apikey = range.getDisplayValue();
+  Logger.log('..fetched API key');
+  
+  var range = SpreadsheetApp.getActiveSheet().getRange('B2'); //grabs Organization ID
+  var organizationId = range.getDisplayValue();
+  Logger.log('..fetched Organization ID');
+  
+  var range = SpreadsheetApp.getActiveSheet().getRange('C2'); //grabs Network ID
+  var networkId = range.getDisplayValue();
+  Logger.log('..fetched Network ID');
+  
+  var range = SpreadsheetApp.getActiveSheet().getRange('D2'); //grabs security appliance serial
+  var securityApplianceSerial = range.getDisplayValue();
+  Logger.log('..fetched Security appliance serial number');
+  
+  var range = SpreadsheetApp.getActiveSheet().getRange('E2'); //grabs timespan to list clients
+  var clientTimespan = range.getDisplayValue();
+  Logger.log('..fetched client list timespan');
+  
+  var range = SpreadsheetApp.getActiveSheet().getRange('F2'); //grabs client dashboard link
+  var clientsURL = range.getDisplayValue();
+  Logger.log('..fetched client dashboard link');
+  
+  switchSheets('Results');
+  
+  Logger.log('Completed fetching user data. Returning all data as JavaScript Object.');
+
+  return {'apikey':apikey,'organizationId':organizationId,'networkId':networkId,'securityApplianceSerial':securityApplianceSerial,'clientTimespan':clientTimespan,'clientsURL':clientsURL}; 
 }
 /* Using the getUserInfo function:
-It simply just grabs the name and the organization of the user. Doesn't require any variables. */
+Grabs the user's API key, organization ID and network ID. Doesn't require any variables. */
 
 
 function verifyInfoWithUser(dataToVerify, errorIfNotVerified) {
@@ -55,23 +95,23 @@ function verifyInfoWithUser(dataToVerify, errorIfNotVerified) {
 /* Using the verifyInfoWithUser function:
 This function takes in some dataToVerify and an errorIfNotVerified. It will prompt the user, and ask if dataToVerify is correct. If the user responds with 
 anything but a yes, it will throw up errorIfNotVerified. */
-//https://api.meraki.com/api/v0/devices/VRT-2207617868457/clients?timespan=86400 http://httpbin.org/get
 
 function resetSheet() {
   var sheet = SpreadsheetApp.getActiveSheet();
   
+  switchSheets('Results');
   sheet.clearContents();
   
   var cell = sheet.getRange('A1');
-  cell.setValue('Device Serial');
+  cell.setValue('Client name');
   var cell = sheet.getRange('B1');
   cell.setValue('Mac Address');
   var cell = sheet.getRange('C1');
-  cell.setValue('Device Model');
-  var cell = sheet.getRange('D1');
   cell.setValue('Lan IP');
-  var cell = sheet.getRange('F1');
-  cell.setValue('Networks:')
+  var cell = sheet.getRange('D1');
+  cell.setValue('Usage down/up in GB')
+  var cell = sheet.getRange('E1');
+  cell.setValue('Meraki dashboard URL')
 
 }
 
@@ -83,7 +123,6 @@ function switchSheets(sheetName) {
  if (newSheet == null || newSheet == undefined) {
    SpreadsheetApp.getActiveSpreadsheet().insertSheet(sheetName);
  }
-  Logger.log(newSheet)
   SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
   newSheet.activate();
   return newSheet;

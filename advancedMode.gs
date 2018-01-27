@@ -1,4 +1,4 @@
-//9:33PM, 1/26/18
+//8:45AM, 1/27/18
 function printOrganizations() {
 
   
@@ -79,6 +79,60 @@ function customAPICall() {
 
   var sheet = switchSheets('Advanced output');
   var apiResult = apiCall(url, apikey);
+  
+  sheet.clear();
+  range = sheet.getRange("A1");
+  cell = sheet.setActiveRange(range);
+  cell.setValue(['Printing response from ' + url])
+  range = sheet.getRange("A2")
+  cell = sheet.setActiveRange(range)
+  cell.setValue([apiResult.stringResponse]);
+}
+
+function customAPICall() {
+ 
+  var ui = SpreadsheetApp.getUi();
+  var userData = getUserInfo();
+  
+  var apikey = userData.apikey;
+  if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;}
+  
+  var response = ui.prompt('What is the URL you want to fetch?', 'Enter the entire URL, including https:// and the domain.', ui.ButtonSet.OK_CANCEL);
+  if (response.getSelectedButton() !== ui.Button.OK) {
+   ui.alert('The user chose to close the dialog.'); 
+   return;
+  }
+   var url = response.getResponseText();
+
+  var sheet = switchSheets('Advanced output');
+  var apiResult = apiCall(url, apikey);
+  
+  sheet.clear();
+  range = sheet.getRange("A1");
+  cell = sheet.setActiveRange(range);
+  cell.setValue(['Printing response from ' + url])
+  range = sheet.getRange("A2")
+  cell = sheet.setActiveRange(range)
+  cell.setValue([apiResult.stringResponse]);
+}
+
+function customAPICallPut() {
+ 
+  var ui = SpreadsheetApp.getUi();
+  var userData = getUserInfo();
+  
+  var apikey = userData.apikey;
+  if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;}
+  
+  var response = ui.prompt('What is the URL you want to fetch?', 'Enter the entire URL, including https:// and the domain.', ui.ButtonSet.OK_CANCEL);
+  if (response.getSelectedButton() !== ui.Button.OK) {
+   ui.alert('The user chose to close the dialog.'); 
+   return;
+  }
+   var url = response.getResponseText();
+
+  var sheet = switchSheets('Advanced output');
+  var apiResult = apiCallPut(url, apikey);
   
   sheet.clear();
   range = sheet.getRange("A1");
