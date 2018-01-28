@@ -1,18 +1,19 @@
-//8:45AM, 1/27/18
+//8:49AM, 1/28/18
 function onOpen(e) { //The 'e' there tells the system that this doesn't work in certain authentication modes. Something to look into, but not a priority.
-  
   var ui = SpreadsheetApp.getUi();
-  SpreadsheetApp.getUi().createMenu('MerakiApp') //Tells the UI to add a space to put items under the mTools add-ons menu in docs
-      .addItem('Start', 'connectToMeraki') //Adds 'Start', the visible text. 'websiter' is the function we're calling.
+  SpreadsheetApp.getUi().createAddonMenu() //Tells the UI to add a space to put items under the mTools add-ons menu in docs
+      .addItem('Start', 'connectToMeraki') 
       .addItem('Block remaining clients', 'blockUnknownClients')
+      .addItem('Approve remaining clients', 'approveUnknownClients')
       .addSeparator()
       .addSubMenu(ui.createMenu('Advanced')
           .addItem('Completely clear sheet', 'completelyClearSheet')
           .addItem('Print organizations', 'printOrganizations')
           .addItem('Print networks', 'printNetworks')
-          .addSubMenu(ui.createMenu('Custom API call')
-          .addItem('Custom GET request', 'customAPICall')
-          .addItem('Custom PUT request', 'customAPICallPut')))
+          .addItem('Unblock clients on Results sheet', 'unblockClients')
+                  .addSubMenu(ui.createMenu('Custom API call')
+                              .addItem('Custom GET request', 'customAPICall')
+                              .addItem('Custom PUT request', 'customAPICallPut')))
       .addToUi(); //Completes the add call.
 }
 
@@ -28,8 +29,6 @@ function connectToMeraki() {
   
   var merakiOrganizationId = userData.organizationId;
   var merakiClientsURL;
-  
-  switchSheets('Results');
   
   var clientList = apiCall('https://api.meraki.com/api/v0/devices/' + userData.securityApplianceSerial + '/clients?timespan=' + userData.clientTimespan, apikey);
   Logger.log('got the device infos:');
@@ -53,7 +52,10 @@ function connectToMeraki() {
   Logger.log(approvedClients);
   sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Results");
   var unknownClients = new Array();
+  var unknownClientsPrint = [];
   
+  
+  var numberOfUnknownDevices = 0;
   for(i in currentClients.jsonResponse){
     var row = currentClients.jsonResponse[i].mac;
     Logger.log(row);
@@ -75,16 +77,14 @@ function connectToMeraki() {
   cell.setValue('Mac address');
   var cell = sheet.getRange('B1');
   cell.setValue('Meraki dashboard URL');
-  var cell = sheet.getRange('C1');
-  cell.setValue('These are all of the clients that aren\'t on your approved clients list.');
   
+  //sheet.getRange(2, 1, unknownClients.length, 2).setValues(newData); //gets a selection. starts on row 2, column 1, with a length of the number of unknown clients, 2 wide
+   
   for (var i = 0; i < unknownClients.length; i++) {
     merakiClientsURL = userData.clientsURL + '#q=' + encodeURIComponent(unknownClients[i]);
-    range = sheet.getRange("A" + (i+2) + ":B" + (i+2));
-    cell = sheet.setActiveRange(range);
-    cell.setValues([[unknownClients[i], merakiClientsURL]]);
+    unknownClientsPrint.push([unknownClients[i],merakiClientsURL]);
   }
-
+  sheet.getRange(2, 1, unknownClients.length, 2).setValues(unknownClientsPrint);
 }
 
 function blockUnknownClients() {
@@ -109,11 +109,39 @@ function blockUnknownClients() {
   for (i = 0; i < unknownClients.length; i++) {
   Logger.log('Attempting to block ' + unknownClients[i] + 'from the network...');
   var unknownClientURI = encodeURIComponent(unknownClients[i]);
-  var response = apiCallPut('https://n126.meraki.com/api/v0/networks/' + userData.networkId + '/clients/' + unknownClients[i] + '/policy?timespan=2592000&devicePolicy=blocked', apikey)
-  range = sheet.getRange("B" + (i+2) + ":B" + (i+2));
+  var response = apiCallPut('https://n126.meraki.com/api/v0/networks/' + userData.networkId + '/clients/' + unknownClients[i] + '/policy?timespan=2592000&devicePolicy=blocked', apikey);
+  range = sheet.getRange("C" + (i+2) + ":C" + (i+2));
   cell = sheet.setActiveRange(range);
   cell.setValue([['Blocked']]);
   Logger.log('Successfully blocked ' + unknownClients[i] + 'from the network.');
   Logger.log(response);
+  Utilities.sleep(400);
+  }
+}
+
+function approveUnknownClients() {
+  var sheet = SpreadsheetApp.getActiveSheet();
+  var ui = SpreadsheetApp.getUi();
+  var cell;
+  var range;
+  var userData = getUserInfo();
+  
+  sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Results");
+  var unknownClients = sheet.getRange('A2:A' + sheet.getLastRow()).getValues();
+  
+  var response = ui.alert('Are you sure you want to approve all clients listed on this sheet?', 'This will add all MAC addresses on this sheet to your approved devices list.' , ui.ButtonSet.YES_NO);
+  if (response != ui.Button.YES) {
+    ui.alert('Cancelling.');
+    return;
+  }
+  sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Approved clients");
+  
+  for (i = 0; i < unknownClients.length; i++) {
+  sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Approved clients");
+  sheet.appendRow([unknownClients[i].join()]);
+  sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Results");
+  range = sheet.getRange("C" + (i+2) + ":C" + (i+2));
+  cell = sheet.setActiveRange(range);
+  cell.setValue([['Added to allowed list.']]);
   }
 }

@@ -1,4 +1,4 @@
-//8:45AM, 1/27/18
+//8:49AM, 1/28/18
 /* This is the discreetFunctions code sheet. It's for functions that take in and put out data, like small processors. It's not for the main code flow. */
 
 function apiCall(url, apikey) {
@@ -46,34 +46,34 @@ function testAPICall() {
 
 function getUserInfo() {
   //find user organization
-  switchSheets('User data');
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('User data');
   Logger.log('Fetching user data from it\'s sheet...');
   
-  var range = SpreadsheetApp.getActiveSheet().getRange('A2'); //grabs API Key
+  var range = sheet.getRange('A2'); //grabs API Key
   var apikey = range.getDisplayValue();
   Logger.log('..fetched API key');
   
-  var range = SpreadsheetApp.getActiveSheet().getRange('B2'); //grabs Organization ID
+  var range = sheet.getRange('B2'); //grabs Organization ID
   var organizationId = range.getDisplayValue();
   Logger.log('..fetched Organization ID');
   
-  var range = SpreadsheetApp.getActiveSheet().getRange('C2'); //grabs Network ID
+  var range = sheet.getRange('C2'); //grabs Network ID
   var networkId = range.getDisplayValue();
   Logger.log('..fetched Network ID');
   
-  var range = SpreadsheetApp.getActiveSheet().getRange('D2'); //grabs security appliance serial
+  var range = sheet.getRange('D2'); //grabs security appliance serial
   var securityApplianceSerial = range.getDisplayValue();
   Logger.log('..fetched Security appliance serial number');
+  Logger.log(securityApplianceSerial);
   
-  var range = SpreadsheetApp.getActiveSheet().getRange('E2'); //grabs timespan to list clients
+  var range = sheet.getRange('E2'); //grabs timespan to list clients
   var clientTimespan = range.getDisplayValue();
   Logger.log('..fetched client list timespan');
   
-  var range = SpreadsheetApp.getActiveSheet().getRange('F2'); //grabs client dashboard link
+  var range = sheet.getRange('F2'); //grabs client dashboard link
   var clientsURL = range.getDisplayValue();
   Logger.log('..fetched client dashboard link');
   
-  switchSheets('Results');
   
   Logger.log('Completed fetching user data. Returning all data as JavaScript Object.');
 
