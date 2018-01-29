@@ -1,4 +1,4 @@
-//10:35AM, 1/29/18
+//10:56AM, 1/29/18
 function onOpen(e) { //The 'e' there tells the system that this doesn't work in certain authentication modes. Something to look into, but not a priority.
   var ui = SpreadsheetApp.getUi();
   SpreadsheetApp.getUi().createAddonMenu() //Tells the UI to add a space to put items under the mTools add-ons menu in docs
@@ -76,8 +76,8 @@ function connectToMeraki() {
   sheet.getRange('A1').setValue('Description');
   sheet.getRange('B1').setValue('MAC address');
   sheet.getRange('C1').setValue('LAN IP');
-  sheet.getRange('C1').setValue('Data down/up in MB');
-  sheet.getRange('C1').setValue('Meraki dashboard URL');
+  sheet.getRange('D1').setValue('Data down/up in MB');
+  sheet.getRange('E1').setValue('Meraki dashboard URL');
   //sheet.getRange(2, 1, unknownClients.length, 2).setValues(newData); //gets a selection. starts on row 2, column 1, with a length of the number of unknown clients, 2 wide
    
   /*for (var i = 0; i < unknownClients.length; i++) {
