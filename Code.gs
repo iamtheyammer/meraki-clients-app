@@ -1,4 +1,4 @@
-//8:43AM, 1/29/18
+//10:35AM, 1/29/18
 function onOpen(e) { //The 'e' there tells the system that this doesn't work in certain authentication modes. Something to look into, but not a priority.
   var ui = SpreadsheetApp.getUi();
   SpreadsheetApp.getUi().createAddonMenu() //Tells the UI to add a space to put items under the mTools add-ons menu in docs
@@ -51,14 +51,13 @@ function connectToMeraki() {
   Logger.log('APPROVED CLIENTS:');
   Logger.log(approvedClients);
   sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Results");
-  var unknownClients = new Array();
-  var unknownClientsPrint = [];
-  
+  var unknownClients = new Array(); //this is the array that will hold the MAC addresses for clients we haven't approved
+  var unknownClientsPrint = []; //this is the array that will be printed to the Results sheet
+  var unknownClientsLineNum = new Array(); //this is the array that will hold the line numbers of the clients that aren't approved so we can get more info about each unknown client without another API call
   
   var numberOfUnknownDevices = 0;
   for(i in currentClients.jsonResponse){
     var row = currentClients.jsonResponse[i].mac;
-    Logger.log(row);
     var duplicate = false;
     for(j in approvedClients){
       if(row == approvedClients[j]){
@@ -67,26 +66,39 @@ function connectToMeraki() {
     }
     if(!duplicate){
       unknownClients.push(row);
+      unknownClientsLineNum.push(i);
     }
   }
   Logger.log("UNKNOWN CLIENTS:");
   Logger.log(unknownClients);
   
   sheet.clear();
-  var cell = sheet.getRange('A1');
-  cell.setValue('Mac address');
-  var cell = sheet.getRange('B1');
-  cell.setValue('Meraki dashboard URL');
-  
+  sheet.getRange('A1').setValue('Description');
+  sheet.getRange('B1').setValue('MAC address');
+  sheet.getRange('C1').setValue('LAN IP');
+  sheet.getRange('C1').setValue('Data down/up in MB');
+  sheet.getRange('C1').setValue('Meraki dashboard URL');
   //sheet.getRange(2, 1, unknownClients.length, 2).setValues(newData); //gets a selection. starts on row 2, column 1, with a length of the number of unknown clients, 2 wide
    
-  for (var i = 0; i < unknownClients.length; i++) {
+  /*for (var i = 0; i < unknownClients.length; i++) {
     merakiClientsURL = userData.clientsURL + '#q=' + encodeURIComponent(unknownClients[i]);
     unknownClientsPrint.push([unknownClients[i],merakiClientsURL]);
+
+  }*/
+  
+  for (var i = 0; i < unknownClientsLineNum.length; i++) {
+    merakiClientsURL = userData.clientsURL + '#q=' + encodeURIComponent(unknownClients[i]);
+    unknownClientsPrint.push([clientList.jsonResponse[unknownClientsLineNum[i]].description, clientList.jsonResponse[unknownClientsLineNum[i]].mac, clientList.jsonResponse[unknownClientsLineNum[i]].ip, clientList.jsonResponse[unknownClientsLineNum[i]].usage.recv/1000 + '/' + clientList.jsonResponse[unknownClientsLineNum[i]].usage.sent/1000, merakiClientsURL]); 
   }
+  
+  
   Logger.log('UNKNOWN CLIENTS LENGTH:');
   Logger.log(unknownClients.length);
-  sheet.getRange(2, 1, unknownClients.length, 2).setValues(unknownClientsPrint);
+  Logger.log('UNKNOWN CLIENTS PRINT:');
+  Logger.log(unknownClientsPrint);
+  Logger.log('UNKNOWN CLIENTS LINENUM:');
+  Logger.log(unknownClientsLineNum);
+  sheet.getRange(2, 1, unknownClients.length, 5).setValues(unknownClientsPrint);
 }
 
 function blockUnknownClients() {
