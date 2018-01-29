@@ -1,4 +1,4 @@
-//8:49AM, 1/28/18
+//8:43AM, 1/29/18
 function onOpen(e) { //The 'e' there tells the system that this doesn't work in certain authentication modes. Something to look into, but not a priority.
   var ui = SpreadsheetApp.getUi();
   SpreadsheetApp.getUi().createAddonMenu() //Tells the UI to add a space to put items under the mTools add-ons menu in docs
@@ -84,6 +84,8 @@ function connectToMeraki() {
     merakiClientsURL = userData.clientsURL + '#q=' + encodeURIComponent(unknownClients[i]);
     unknownClientsPrint.push([unknownClients[i],merakiClientsURL]);
   }
+  Logger.log('UNKNOWN CLIENTS LENGTH:');
+  Logger.log(unknownClients.length);
   sheet.getRange(2, 1, unknownClients.length, 2).setValues(unknownClientsPrint);
 }
 
