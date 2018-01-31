@@ -1,4 +1,4 @@
-//8:43AM, 1/29/18
+//11:00PM, 1/30/18
 /* This is the discreetFunctions code sheet. It's for functions that take in and put out data, like small processors. It's not for the main code flow. */
 
 function apiCall(url, apikey) {
@@ -47,36 +47,25 @@ function testAPICall() {
 function getUserInfo() {
   //find user organization
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('User data');
-  Logger.log('Fetching user data from it\'s sheet...');
   
   var range = sheet.getRange('A2'); //grabs API Key
   var apikey = range.getDisplayValue();
-  Logger.log('..fetched API key');
   
   var range = sheet.getRange('B2'); //grabs Organization ID
   var organizationId = range.getDisplayValue();
-  Logger.log('..fetched Organization ID');
   
   var range = sheet.getRange('C2'); //grabs Network ID
   var networkId = range.getDisplayValue();
-  Logger.log('..fetched Network ID');
   
   var range = sheet.getRange('D2'); //grabs security appliance serial
   var securityApplianceSerial = range.getDisplayValue();
-  Logger.log('..fetched Security appliance serial number');
-  Logger.log(securityApplianceSerial);
   
   var range = sheet.getRange('E2'); //grabs timespan to list clients
   var clientTimespan = range.getDisplayValue();
-  Logger.log('..fetched client list timespan');
   
   var range = sheet.getRange('F2'); //grabs client dashboard link
   var clientsURL = range.getDisplayValue();
-  Logger.log('..fetched client dashboard link');
   
-  
-  Logger.log('Completed fetching user data. Returning all data as JavaScript Object.');
-
   return {'apikey':apikey,'organizationId':organizationId,'networkId':networkId,'securityApplianceSerial':securityApplianceSerial,'clientTimespan':clientTimespan,'clientsURL':clientsURL}; 
 }
 /* Using the getUserInfo function:
@@ -96,6 +85,7 @@ function verifyInfoWithUser(dataToVerify, errorIfNotVerified) {
 This function takes in some dataToVerify and an errorIfNotVerified. It will prompt the user, and ask if dataToVerify is correct. If the user responds with 
 anything but a yes, it will throw up errorIfNotVerified. */
 
+/* DEPRECATED DEPRECATED DEPRECATED
 function resetSheet() {
   var sheet = SpreadsheetApp.getActiveSheet();
   
@@ -115,7 +105,7 @@ function resetSheet() {
 
 }
 
-/* Using the resetSheet function:
+ Using the resetSheet function:
 This function is called directly from the menu, so nothing comes in and nothing is returned. It can also be called from inside of the code. */
 
 function switchSheets(sheetName) {
@@ -136,9 +126,3 @@ var sheet = switchSheets('sheetName');
 to make sure that you get the active sheet object. then, you'll be able to do operations like:
 sheet.clear();
 */
-
-function completelyClearSheet() {
- SpreadsheetApp.getActiveSheet().clear();
-}
-/* Using the completelyClearSheet() function:
-You'll probably never need to use this because you can just sheet.clear();. It's just for the advanced functions menu. */
