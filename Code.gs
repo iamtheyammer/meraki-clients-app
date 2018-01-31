@@ -1,4 +1,4 @@
-//10:56AM, 1/29/18
+//10:35PM, 1/30/18
 function onOpen(e) { //The 'e' there tells the system that this doesn't work in certain authentication modes. Something to look into, but not a priority.
   var ui = SpreadsheetApp.getUi();
   SpreadsheetApp.getUi().createAddonMenu() //Tells the UI to add a space to put items under the mTools add-ons menu in docs
@@ -21,8 +21,6 @@ function connectToMeraki() {
 
   var sheet = SpreadsheetApp.getActiveSheet();
   var ui = SpreadsheetApp.getUi();
-  var cell;
-  var range;
   var userData = getUserInfo();
   var apikey = userData.apikey;
   if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;}
@@ -76,7 +74,7 @@ function connectToMeraki() {
   sheet.getRange('A1').setValue('Description');
   sheet.getRange('B1').setValue('MAC address');
   sheet.getRange('C1').setValue('LAN IP');
-  sheet.getRange('D1').setValue('Data down/up in MB');
+  sheet.getRange('D1').setValue('Data up/down in MB');
   sheet.getRange('E1').setValue('Meraki dashboard URL');
   //sheet.getRange(2, 1, unknownClients.length, 2).setValues(newData); //gets a selection. starts on row 2, column 1, with a length of the number of unknown clients, 2 wide
    
@@ -112,7 +110,8 @@ function blockUnknownClients() {
   if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;}
   
   sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Results");
-  var unknownClients = sheet.getRange('A2:A' + sheet.getLastRow()).getValues();
+  var unknownClients = sheet.getRange('B2:B' + sheet.getLastRow()).getValues();
+  sheet.getRange('F1').setValue('Device policy');
   
   var response = ui.alert('Are you sure you want to block all clients listed on this sheet?', 'You can press no below to remove clients you don\'t want to block.' , ui.ButtonSet.YES_NO);
   if (response != ui.Button.YES) {
@@ -124,7 +123,7 @@ function blockUnknownClients() {
   Logger.log('Attempting to block ' + unknownClients[i] + 'from the network...');
   var unknownClientURI = encodeURIComponent(unknownClients[i]);
   var response = apiCallPut('https://n126.meraki.com/api/v0/networks/' + userData.networkId + '/clients/' + unknownClients[i] + '/policy?timespan=2592000&devicePolicy=blocked', apikey);
-  range = sheet.getRange("C" + (i+2) + ":C" + (i+2));
+  range = sheet.getRange("F" + (i+2) + ":F" + (i+2));
   cell = sheet.setActiveRange(range);
   cell.setValue([['Blocked']]);
   Logger.log('Successfully blocked ' + unknownClients[i] + 'from the network.');
@@ -136,12 +135,11 @@ function blockUnknownClients() {
 function approveUnknownClients() {
   var sheet = SpreadsheetApp.getActiveSheet();
   var ui = SpreadsheetApp.getUi();
-  var cell;
-  var range;
+
   var userData = getUserInfo();
   
-  sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Results");
-  var unknownClients = sheet.getRange('A2:A' + sheet.getLastRow()).getValues();
+  sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Results").activate();
+  var unknownClients = sheet.getRange('B2:B' + sheet.getLastRow()).getValues();
   
   var response = ui.alert('Are you sure you want to approve all clients listed on this sheet?', 'This will add all MAC addresses on this sheet to your approved devices list.' , ui.ButtonSet.YES_NO);
   if (response != ui.Button.YES) {
@@ -153,9 +151,26 @@ function approveUnknownClients() {
   for (i = 0; i < unknownClients.length; i++) {
   sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Approved clients");
   sheet.appendRow([unknownClients[i].join()]);
-  sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Results");
-  range = sheet.getRange("C" + (i+2) + ":C" + (i+2));
-  cell = sheet.setActiveRange(range);
+  sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Results").getRange("F" + (i+2) + ":F" + (i+2));
+  var cell = sheet.activate();
   cell.setValue([['Added to allowed list.']]);
   }
+  
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients');
+  var data = sheet.getDataRange().getValues();
+  var newData = new Array();
+  for(i in data){
+    var row = data[i];
+    var duplicate = false;
+    for(j in newData){
+      if(row.join() == newData[j].join()){
+        duplicate = true;
+      }
+    }
+    if(!duplicate){
+      newData.push(row);
+    }
+  }
+  sheet.clearContents();
+  sheet.getRange(1, 1, newData.length, newData[0].length).setValues(newData);
 }

@@ -1,4 +1,4 @@
-//8:43AM, 1/29/18
+//10:35PM, 1/30/18
 function printOrganizations() {
 
   
@@ -12,7 +12,7 @@ function printOrganizations() {
   var apikey = userData.apikey;
   if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;}
   
-  switchSheets("Advanced output");
+  sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Advanced output").activate();
   sheet.clear();
   var userOrganizations = apiCall('https://api.meraki.com/api/v0/organizations/', apikey);
   
@@ -45,7 +45,7 @@ function printNetworks() {
   var organizationId = userData.organizationId;
   if (organizationId.length <= 1) {ui.alert('Your Organization ID is missing or too short.'); return;}
   
-  switchSheets('Advanced output');
+  sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Advanced output").activate();
   sheet.clear();
   
   var networkList = apiCall('https://api.meraki.com/api/v0/organizations/' + organizationId + '/networks', apikey);
@@ -155,7 +155,7 @@ function unblockClients() {
   
   sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Results");
   sheet.activate();
-  var unknownClients = sheet.getRange('A2:A' + sheet.getLastRow()).getValues();
+  var unknownClients = sheet.getRange('B2:B' + sheet.getLastRow()).getValues();
   
   var response = ui.alert('Are you sure you want to unblock all clients listed on this sheet?', 'You can press no below to remove clients you don\'t want to unblock.' , ui.ButtonSet.YES_NO);
   if (response != ui.Button.YES) {
@@ -163,11 +163,13 @@ function unblockClients() {
     return;
   }
   
+  sheet.getRange('F1').setValue('Device policy');
+  
   for (i = 0; i < unknownClients.length; i++) {
   Logger.log('Attempting to block ' + unknownClients[i] + 'from the network...');
   var unknownClientURI = encodeURIComponent(unknownClients[i]);
   var response = apiCallPut('https://n126.meraki.com/api/v0/networks/' + userData.networkId + '/clients/' + unknownClients[i] + '/policy?timespan=2592000&devicePolicy=normal', apikey);
-  range = sheet.getRange("C" + (i+2) + ":C" + (i+2));
+  range = sheet.getRange("F" + (i+2) + ":F" + (i+2));
   cell = sheet.setActiveRange(range);
   cell.setValue([['Device policy set to Normal']]);
   Logger.log('Successfully allowed ' + unknownClients[i] + ' onto the network.');
