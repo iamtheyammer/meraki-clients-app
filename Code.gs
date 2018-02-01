@@ -25,7 +25,7 @@ function connectToMeraki() {
   var apikey = userData.apikey; //set our api key from above data
   if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;} //check the API key is longer than 20 characters
   
-  apiCallPut('https://api.mismatch.io:8000/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=connectToMeraki', 'noApiKeyNeeded'); //analytics
+  apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=connectToMeraki', 'noApiKeyNeeded'); //analytics
   
   var merakiOrganizationId = userData.organizationId;
   var merakiClientsURL;
@@ -95,7 +95,7 @@ function blockUnknownClients() {
   var range;
   var userData = getUserInfo();
   
-  apiCallPut('https://api.mismatch.io:8000/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=blockUnknownClients', 'noApiKeyNeeded'); //analytics
+  apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=blockUnknownClients', 'noApiKeyNeeded'); //analytics
   
   var apikey = userData.apikey;
   if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;}
@@ -126,7 +126,7 @@ function approveUnknownClients() {
 
   var userData = getUserInfo();
   
-  apiCallPut('https://api.mismatch.io:8000/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=approveUnknownClients', 'noApiKeyNeeded'); //analytics
+  apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=approveUnknownClients', 'noApiKeyNeeded'); //analytics
   
   sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Results").activate(); //visually switch sheets to Results
   var unknownClients = sheet.getRange('B2:B' + sheet.getLastRow()).getValues(); //grab the mac addresses

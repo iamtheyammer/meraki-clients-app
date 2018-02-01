@@ -6,7 +6,7 @@ function printOrganizations() {
   var cell;
   var range;
   
-  apiCallPut('https://api.mismatch.io:8000/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=printOrganizations', 'noApiKeyNeeded'); //analytics
+  apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=printOrganizations', 'noApiKeyNeeded'); //analytics
   
   var userData = getUserInfo();
   
@@ -39,7 +39,7 @@ function printNetworks() {
   var cell;
   var range;
   
-  apiCallPut('https://api.mismatch.io:8000/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=printNetworks', 'noApiKeyNeeded'); //analytics
+  apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=printNetworks', 'noApiKeyNeeded'); //analytics
   
   var userData = getUserInfo();
   
@@ -70,7 +70,7 @@ function customAPICall() {
  
   var ui = SpreadsheetApp.getUi();
   
-  apiCallPut('https://api.mismatch.io:8000/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=customAPICall', 'noApiKeyNeeded'); //analytics
+  apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=customAPICall', 'noApiKeyNeeded'); //analytics
   
   var userData = getUserInfo();
   var apikey = userData.apikey;
@@ -99,7 +99,7 @@ function customAPICallPut() {
  
   var ui = SpreadsheetApp.getUi();
   
-  apiCallPut('https://api.mismatch.io:8000/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=customAPICallPut', 'noApiKeyNeeded'); //analytics
+  apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=customAPICallPut', 'noApiKeyNeeded'); //analytics
   
   var userData = getUserInfo();
   var apikey = userData.apikey;
@@ -131,7 +131,7 @@ function unblockClients() {
   var cell;
   var range;
   
-  apiCallPut('https://api.mismatch.io:8000/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=unblockClients', 'noApiKeyNeeded'); //analytics
+  apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=unblockClients', 'noApiKeyNeeded'); //analytics
   
   var userData = getUserInfo();
   var apikey = userData.apikey;
