@@ -1,4 +1,4 @@
-//9:12PM, 1/31/18
+//3:22PM, 2/1/18
 function onOpen(e) { //The 'e' there tells the system that this doesn't work in certain authentication modes. Something to look into, but not a priority.
   var ui = SpreadsheetApp.getUi();
   SpreadsheetApp.getUi().createAddonMenu() //Tells the UI to add a space to put items under the add-ons menu in docs
@@ -18,7 +18,7 @@ function onOpen(e) { //The 'e' there tells the system that this doesn't work in 
 }
 
 function connectToMeraki() {
-
+  try {
   var sheet = SpreadsheetApp.getActiveSheet();
   var ui = SpreadsheetApp.getUi();
   var userData = getUserInfo(); //grab the user's data: see discreetFunctions
@@ -85,17 +85,29 @@ function connectToMeraki() {
   }
   
   sheet.getRange(2, 1, unknownClients.length, 5).setValues(unknownClientsPrint); //get a range large enough for our data and paste the data in
+    
+  } catch(e) {
+    var payload = {
+       "id":"vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk",
+       "function":"connectToMeraki",
+       "fileName":e.fileName,
+       "lineNumber":e.lineNumber,
+       "message":e.message,
+    };
+    apiCallPost('https://api.mismatch.io/analytics/error', payload);
+    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message); 
+  }
 }
 
 function blockUnknownClients() {
- 
+  try {
   var sheet = SpreadsheetApp.getActiveSheet();
   var ui = SpreadsheetApp.getUi();
   var cell;
   var range;
   var userData = getUserInfo();
   
-  apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=blockUnknownClients', 'noApiKeyNeeded'); //analytics
+  apiCallPut('https://api.mismatch.io:8000/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=blockUnknownClients', 'noApiKeyNeeded'); //analytics
   
   var apikey = userData.apikey;
   if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;}
@@ -118,6 +130,18 @@ function blockUnknownClients() {
   cell.setValue([['Blocked']]); //put data in the cell
   Utilities.sleep(400); //wait 400 milliseconds to comply with meraki's 5 calls/second limit
   }
+    
+  } catch(e) {
+    var payload = {
+       "id":"vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk",
+       "function":"connectToMeraki",
+       "fileName":e.fileName,
+       "lineNumber":e.lineNumber,
+       "message":e.message,
+    };
+    apiCallPost('https://api.mismatch.io/analytics/error', payload);
+    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message); 
+  }
 }
 
 function approveUnknownClients() {
@@ -125,7 +149,7 @@ function approveUnknownClients() {
   var ui = SpreadsheetApp.getUi();
 
   var userData = getUserInfo();
-  
+  try {
   apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=approveUnknownClients', 'noApiKeyNeeded'); //analytics
   
   sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Results").activate(); //visually switch sheets to Results
@@ -163,4 +187,16 @@ function approveUnknownClients() {
   }
   sheet.clearContents();
   sheet.getRange(1, 1, newData.length, newData[0].length).setValues(newData); //above code (whole paragraph) finds and removes duplicates in the approved clients list
+  
+  } catch(e) {
+    var payload = {
+       "id":"vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk",
+       "function":"connectToMeraki",
+       "fileName":e.fileName,
+       "lineNumber":e.lineNumber,
+       "message":e.message,
+    };
+    apiCallPost('https://api.mismatch.io/analytics/error', payload);
+    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message); 
+  }
 }

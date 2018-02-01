@@ -1,13 +1,13 @@
-//9:12PM, 1/31/18
+//3:25PM, 2/1/18
 function printOrganizations() {
-
+  try {
   var sheet = SpreadsheetApp.getActiveSheet();
   var ui = SpreadsheetApp.getUi();
   var cell;
   var range;
   
   apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=printOrganizations', 'noApiKeyNeeded'); //analytics
-  
+ 
   var userData = getUserInfo();
   
   var apikey = userData.apikey;
@@ -28,10 +28,22 @@ function printOrganizations() {
     cell = sheet.setActiveRange(range);
     cell.setValues([[userOrganizations.jsonResponse[i].name, userOrganizations.jsonResponse[i].id]]);
   }
+  } catch(e) {
+    var payload = {
+       "id":"vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk",
+       "function":"printOrganizations",
+       "fileName":e.fileName,
+       "lineNumber":e.lineNumber,
+       "message":e.message,
+    };
+    apiCallPost('https://api.mismatch.io/analytics/error', payload);
+    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message);
+    
+  }
 }
   
 function printNetworks() {
-  
+  try {
   
   
   var sheet = SpreadsheetApp.getActiveSheet();
@@ -63,6 +75,17 @@ function printNetworks() {
     range = sheet.getRange("A" + (i+2) + ":B" + (i+2));
     cell = sheet.setActiveRange(range);
     cell.setValues([[networkList.jsonResponse[i].name, networkList.jsonResponse[i].id]]);
+  }
+  } catch(e) {
+    var payload = {
+       "id":"vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk",
+       "function":"printNetworks",
+       "fileName":e.fileName,
+       "lineNumber":e.lineNumber,
+       "message":e.message,
+    };
+    apiCallPost('https://api.mismatch.io/analytics/error', payload);
+    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message); 
   }
 }
 
@@ -125,7 +148,7 @@ function customAPICallPut() {
 }
 
 function unblockClients() {
- 
+  try {
   var sheet = SpreadsheetApp.getActiveSheet();
   var ui = SpreadsheetApp.getUi();
   var cell;
@@ -159,8 +182,20 @@ function unblockClients() {
   Logger.log(response);
   Utilities.sleep(400); //wait 400 milliseconds to comply with meraki's 5 calls/second limit
   }
+  } catch(e) {
+    var payload = {
+       "id":"vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk",
+       "function":"connectToMeraki",
+       "fileName":e.fileName,
+       "lineNumber":e.lineNumber,
+       "message":e.message,
+    };
+    apiCallPost('https://api.mismatch.io/analytics/error', payload);
+    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message); 
+  }
 }
 
 function completelyClearSheet() {
+ apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=completelyClearSheet', 'noApiKeyNeeded'); //analytics
  SpreadsheetApp.getActiveSheet().clear();
 }
