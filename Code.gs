@@ -1,4 +1,4 @@
-//11:00PM, 1/30/18
+//9:12PM, 1/31/18
 function onOpen(e) { //The 'e' there tells the system that this doesn't work in certain authentication modes. Something to look into, but not a priority.
   var ui = SpreadsheetApp.getUi();
   SpreadsheetApp.getUi().createAddonMenu() //Tells the UI to add a space to put items under the add-ons menu in docs
@@ -24,6 +24,8 @@ function connectToMeraki() {
   var userData = getUserInfo(); //grab the user's data: see discreetFunctions
   var apikey = userData.apikey; //set our api key from above data
   if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;} //check the API key is longer than 20 characters
+  
+  apiCallPut('https://api.mismatch.io:8000/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=connectToMeraki', 'noApiKeyNeeded'); //analytics
   
   var merakiOrganizationId = userData.organizationId;
   var merakiClientsURL;
@@ -92,6 +94,9 @@ function blockUnknownClients() {
   var cell;
   var range;
   var userData = getUserInfo();
+  
+  apiCallPut('https://api.mismatch.io:8000/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=blockUnknownClients', 'noApiKeyNeeded'); //analytics
+  
   var apikey = userData.apikey;
   if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;}
   
@@ -120,6 +125,8 @@ function approveUnknownClients() {
   var ui = SpreadsheetApp.getUi();
 
   var userData = getUserInfo();
+  
+  apiCallPut('https://api.mismatch.io:8000/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=approveUnknownClients', 'noApiKeyNeeded'); //analytics
   
   sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Results").activate(); //visually switch sheets to Results
   var unknownClients = sheet.getRange('B2:B' + sheet.getLastRow()).getValues(); //grab the mac addresses
