@@ -1,4 +1,4 @@
-//12:21PM, 2/8/18
+
 /* This is the discreetFunctions code sheet. It's for functions that take in and put out data, like small processors. It's not for the main code flow. */
 
 function apiCall(url, apikey) {
@@ -73,10 +73,11 @@ function getUserInfo() {
   
   var range = sheet.getRange('D2'); //grabs security appliance serial
   var securityApplianceSerial = range.getDisplayValue();
+
   
   var range = sheet.getRange('E2'); //grabs timespan to list clients
   var clientTimespan = range.getDisplayValue();
-  
+    
   var range = sheet.getRange('F2'); //grabs client dashboard link
   var clientsURL = range.getDisplayValue();
   
@@ -95,7 +96,6 @@ function getUserInfo() {
 }
 /* Using the getUserInfo function:
 Grabs the user's API key, organization ID and network ID. Doesn't require any variables. */
-
 
 function verifyInfoWithUser(dataToVerify, errorIfNotVerified) {
   try {
@@ -175,6 +175,7 @@ var sheet = switchSheets('sheetName');
 to make sure that you get the active sheet object. then, you'll be able to do operations like:
 sheet.clear();
 */
+
 
 function getApprovedClients() {
  
