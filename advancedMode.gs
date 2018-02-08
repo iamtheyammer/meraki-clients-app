@@ -199,3 +199,7 @@ function completelyClearSheet() {
  apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=completelyClearSheet', 'noApiKeyNeeded'); //analytics
  SpreadsheetApp.getActiveSheet().clear();
 }
+
+function getSpreadsheetId() {
+  SpreadsheetApp.getUi().alert('Spreadsheet ID:', SpreadsheetApp.getActiveSpreadsheet().getId(), SpreadsheetApp.getUi().ButtonSet.OK); //gets spreadsheet ID and displays it to the user
+}
