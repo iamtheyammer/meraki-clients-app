@@ -1,4 +1,4 @@
-//3:25PM, 2/1/18
+//2:28PM, 2/8/18
 function printOrganizations() {
   try {
   var sheet = SpreadsheetApp.getActiveSheet();
