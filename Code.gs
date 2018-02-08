@@ -1,4 +1,4 @@
-//10:45AM, 2/8/18
+//12:20PM, 2/8/18
 function onInstall(e) {
  onOpen(e); 
 }
@@ -35,21 +35,22 @@ function connectToMeraki() {
   var merakiOrganizationId = userData.organizationId;
   var merakiClientsURL;
   
-  var clientList = apiCall('https://api.meraki.com/api/v0/devices/' + userData.securityApplianceSerial + '/clients?timespan=' + userData.clientTimespan, apikey); //grab all clients connected to security appliance
-  var numberOfClients = clientList.jsonResponse.length;
+  var currentClients = apiCall('https://api.meraki.com/api/v0/devices/' + userData.securityApplianceSerial + '/clients?timespan=' + userData.clientTimespan, apikey); //grab all clients connected to security appliance
+  var numberOfClients = currentClients.jsonResponse.length;
   
  /* for (var i = 0; i < numberOfClients; i++) {
-    merakiClientsURL = userData.clientsURL + '#q=' + encodeURIComponent(clientList.jsonResponse[i].mac);
+    merakiClientsURL = userData.clientsURL + '#q=' + encodeURIComponent(currentClients.jsonResponse[i].mac);
     range = sheet.getRange("A" + (i+2) + ":E" + (i+2));
     cell = sheet.setActiveRange(range);
-    cell.setValues([[clientList.jsonResponse[i].description, clientList.jsonResponse[i].mac, clientList.jsonResponse[i].ip, clientList.jsonResponse[i].usage.recv/1000000 + '/' + clientList.jsonResponse[i].usage.sent/1000000, merakiClientsURL]]); 
+    cell.setValues([[currentClients.jsonResponse[i].description, currentClients.jsonResponse[i].mac, currentClients.jsonResponse[i].ip, currentClients.jsonResponse[i].usage.recv/1000000 + '/' + currentClients.jsonResponse[i].usage.sent/1000000, merakiClientsURL]]); 
   }
   This for loop prints out all client data.*/
   
   sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Results");
-  var currentClients = clientList; //gets the clients that are currently connected.
+  var currentClients = currentClients; //gets the clients that are currently connected.
   sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Approved clients");
-  var approvedClients = getApprovedClients(); //gets the clients that are approved to connect.
+  var approvedClientsResponse = getApprovedClients();
+  var approvedClients = JSON.stringify(approvedClientsResponse);
   sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Results");
   var unknownClients = new Array(); //this is the array that will hold the MAC addresses for clients we haven't approved
   var unknownClientsPrint = []; //this is the array that will be printed to the Results sheet
@@ -61,17 +62,14 @@ function connectToMeraki() {
     var row = currentClients.jsonResponse[i].mac; //set the row to a mac address
     var duplicate = false; //assume every row is not a duplicate
     
-    for(j in approvedClients){
-      Logger.log(approvedClients[j][j].join());
-      if(row == approvedClients.indexOf(row)){ //if the row matches an entry on the approved clients list.
+    for(j in approvedClientsResponse){
+      if(approvedClients.indexOf(row) > -1){ //if the row matches an entry on the approved clients list.
         duplicate = true; //mark it as a duplicate
       }
     }
     if(!duplicate){ //if it's not a duplicate,
       unknownClients.push(row); //add it to unknownClients, and
       unknownClientsLineNum.push(i); //add the line number to unknownClientsLineNum
-      Logger.log('IS NOT DUPLICATE:')
-        Logger.log(row);
     }
   }
   
@@ -91,7 +89,7 @@ function connectToMeraki() {
   
   for (var i = 0; i < unknownClientsLineNum.length; i++) {
     merakiClientsURL = userData.clientsURL + '#q=' + encodeURIComponent(unknownClients[i]); //set up the URLs: encode the mac address so it's readable by meraki
-    unknownClientsPrint.push([clientList.jsonResponse[unknownClientsLineNum[i]].description, clientList.jsonResponse[unknownClientsLineNum[i]].mac, clientList.jsonResponse[unknownClientsLineNum[i]].ip, clientList.jsonResponse[unknownClientsLineNum[i]].usage.recv/1000 + '/' + clientList.jsonResponse[unknownClientsLineNum[i]].usage.sent/1000, merakiClientsURL]); 
+    unknownClientsPrint.push([currentClients.jsonResponse[unknownClientsLineNum[i]].description, currentClients.jsonResponse[unknownClientsLineNum[i]].mac, currentClients.jsonResponse[unknownClientsLineNum[i]].ip, currentClients.jsonResponse[unknownClientsLineNum[i]].usage.recv/1000 + '/' + currentClients.jsonResponse[unknownClientsLineNum[i]].usage.sent/1000, merakiClientsURL]); 
   }
   
   sheet.getRange(2, 1, unknownClients.length, 5).setValues(unknownClientsPrint); //get a range large enough for our data and paste the data in
@@ -117,7 +115,7 @@ function blockUnknownClients() {
   var range;
   var userData = getUserInfo();
   
-  apiCallPut('https://api.mismatch.io:8000/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=blockUnknownClients', 'noApiKeyNeeded'); //analytics
+  apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=blockUnknownClients', 'noApiKeyNeeded'); //analytics
   
   var apikey = userData.apikey;
   if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;}

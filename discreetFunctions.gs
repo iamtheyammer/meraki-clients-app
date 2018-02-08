@@ -1,4 +1,4 @@
-//10:44AM, 2/8/18
+//12:21PM, 2/8/18
 /* This is the discreetFunctions code sheet. It's for functions that take in and put out data, like small processors. It's not for the main code flow. */
 
 function apiCall(url, apikey) {
@@ -178,22 +178,16 @@ sheet.clear();
 
 function getApprovedClients() {
  
-  var indexingSheetIds = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('A2:A' + SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getLastRow()).getValues();
-  Logger.log(indexingSheetIds);
+  var indexingSheetUrls = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('A2:A' + SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getLastRow()).getValues();
   var indexingSheetNames = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('B2:B' + SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getLastRow()).getValues();
-  Logger.log(indexingSheetNames);
   var indexingSheetFirstCells = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('C2:C' + SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getLastRow()).getValues();
-  Logger.log(indexingSheetFirstCells);
   var approvedClients = [];
   
-  for (var i = 0; i < indexingSheetIds.length; i++) {
+  for (var i = 0; i < indexingSheetUrls.length; i++) {
     Logger.log(i);
-    var spreadSheet = SpreadsheetApp.openById(indexingSheetIds[i].join());  //want to open by link
+    var spreadSheet = SpreadsheetApp.openByUrl(indexingSheetUrls[i].join());
     var sheet = spreadSheet.getSheetByName(indexingSheetNames[i].join());
-    //spreadSheet.getSheetByName(indexingSheetNames).getRange(indexingSheetFirstCells + ':' + spreadSheet.getLastRow());
-    //var approvedClients = (spreadSheet.getSheetByName(indexingSheetNames).getRange(indexingSheetFirstCells + ':' + indexingSheetFirstCells[i].slice(0,1) + spreadSheet.getSheetByName(indexingSheetNames).getLastRow()).getValues());
     approvedClients.push(sheet.getRange(indexingSheetFirstCells[i].join() + ':' + indexingSheetFirstCells[i].join().slice(0,1) + spreadSheet.getSheetByName(indexingSheetNames[i]).getLastRow()).getValues());
-
   }
   Logger.log(approvedClients);
  return approvedClients;
