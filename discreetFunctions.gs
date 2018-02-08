@@ -1,4 +1,4 @@
-
+//12:21PM, 2/8/18
 /* This is the discreetFunctions code sheet. It's for functions that take in and put out data, like small processors. It's not for the main code flow. */
 
 function apiCall(url, apikey) {
@@ -73,11 +73,10 @@ function getUserInfo() {
   
   var range = sheet.getRange('D2'); //grabs security appliance serial
   var securityApplianceSerial = range.getDisplayValue();
-
   
   var range = sheet.getRange('E2'); //grabs timespan to list clients
   var clientTimespan = range.getDisplayValue();
-    
+  
   var range = sheet.getRange('F2'); //grabs client dashboard link
   var clientsURL = range.getDisplayValue();
   
@@ -96,6 +95,7 @@ function getUserInfo() {
 }
 /* Using the getUserInfo function:
 Grabs the user's API key, organization ID and network ID. Doesn't require any variables. */
+
 
 function verifyInfoWithUser(dataToVerify, errorIfNotVerified) {
   try {
@@ -176,20 +176,28 @@ to make sure that you get the active sheet object. then, you'll be able to do op
 sheet.clear();
 */
 
-
 function getApprovedClients() {
- 
-  var indexingSheetUrls = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('A2:A' + SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getLastRow()).getValues();
-  var indexingSheetNames = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('B2:B' + SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getLastRow()).getValues();
-  var indexingSheetFirstCells = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('C2:C' + SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getLastRow()).getValues();
+	try {
+	var indexingSheetUrls = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('A2:A' + SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getLastRow()).getValues(); //get the URLs of all the sheets to index for the approved clients list
+  var indexingSheetNames = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('B2:B' + SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getLastRow()).getValues(); //get the sheet names of all the sheets to index for the approved clients list
+  var indexingSheetFirstCells = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('C2:C' + SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getLastRow()).getValues(); //get the first cells of all the sheets to index for the approved clients list
   var approvedClients = [];
   
   for (var i = 0; i < indexingSheetUrls.length; i++) {
-    Logger.log(i);
-    var spreadSheet = SpreadsheetApp.openByUrl(indexingSheetUrls[i].join());
-    var sheet = spreadSheet.getSheetByName(indexingSheetNames[i].join());
-    approvedClients.push(sheet.getRange(indexingSheetFirstCells[i].join() + ':' + indexingSheetFirstCells[i].join().slice(0,1) + spreadSheet.getSheetByName(indexingSheetNames[i]).getLastRow()).getValues());
+	var spreadSheet = SpreadsheetApp.openByUrl(indexingSheetUrls[i].join()); //open the i-st spreadsheet
+    var sheet = spreadSheet.getSheetByName(indexingSheetNames[i].join()); //open the sheet inside of aforementioned spreadsheet
+    approvedClients.push(sheet.getRange(indexingSheetFirstCells[i].join() + ':' + indexingSheetFirstCells[i].join().slice(0,1) + spreadSheet.getSheetByName(indexingSheetNames[i]).getLastRow()).getValues()); //add all of the mac addresses on that sheet to the approved clients variable
   }
-  Logger.log(approvedClients);
- return approvedClients;
+  return approvedClients; //retunr our final product
+} catch(e) { //I feel like this script might have a high chance for error, so I better add proper error reporting.
+  var payload = {
+     "id":"vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk",
+     "function":"getApprovedClients",
+     "fileName":e.fileName,
+     "lineNumber":e.lineNumber,
+     "message":e.message,
+  };
+  apiCallPost('https://api.mismatch.io/analytics/error', payload);
+  SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message); 
+}
 }

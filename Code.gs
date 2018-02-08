@@ -30,7 +30,7 @@ function connectToMeraki() {
   var apikey = userData.apikey; //set our api key from above data
   if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;} //check the API key is longer than 20 characters
   
-  apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=connectToMeraki', 'noApiKeyNeeded'); //analytics
+  //apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=connectToMeraki', 'noApiKeyNeeded'); //analytics
   
   var merakiOrganizationId = userData.organizationId;
   var merakiClientsURL;
@@ -91,10 +91,11 @@ function connectToMeraki() {
     merakiClientsURL = userData.clientsURL + '#q=' + encodeURIComponent(unknownClients[i]); //set up the URLs: encode the mac address so it's readable by meraki
     unknownClientsPrint.push([currentClients.jsonResponse[unknownClientsLineNum[i]].description, currentClients.jsonResponse[unknownClientsLineNum[i]].mac, currentClients.jsonResponse[unknownClientsLineNum[i]].ip, currentClients.jsonResponse[unknownClientsLineNum[i]].usage.recv/1000 + '/' + currentClients.jsonResponse[unknownClientsLineNum[i]].usage.sent/1000, merakiClientsURL]); 
   }
-    if (unknownClientsPrint.length >= 1) {
+    if (unknownClientsPrint.length >= 1) { //if there are no unknown clients
       sheet.getRange(2, 1, unknownClients.length, 5).setValues(unknownClientsPrint); //get a range large enough for our data and paste the data in
-    } else {
-      ui.alert('Congratulations!', 'You don\'t have any un-approved devices! (if you think you do, you might want to check the \'Client timespan\' setting in the User data sheet. you can also check all of the sheets that make up your approved devices list and check those as well.)', ui.ButtonSet.OK); 
+	  //print out the unknown clients
+    } else { //otherwise,
+		ui.alert('Congratulations!', 'You don\'t have any un-approved devices! (if you think you do, you might want to check the \'Client timespan\' setting in the User data sheet. you can also check all of the sheets that make up your approved devices list and check those as well.)', ui.ButtonSet.OK); //congratulate the user that their network is in pristine perfectness
     }
   } catch(e) {
     var payload = {
@@ -172,7 +173,7 @@ function approveUnknownClients() {
     
   }
    
-  var sheetUrl = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('A2').getValues();
+  var sheetUrl = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('A2').getValues(); //grab sheet to write to
   var sheetName = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('B2').getValues();
   //var sheetCell = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('C2').getValues();
   var writingSheet = SpreadsheetApp.openByUrl(sheetUrl).getSheetByName(sheetName);
