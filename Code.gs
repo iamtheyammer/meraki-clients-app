@@ -1,4 +1,8 @@
-//3:22PM, 2/1/18
+//10:45AM, 2/8/18
+function onInstall(e) {
+ onOpen(e); 
+}
+
 function onOpen(e) { //The 'e' there tells the system that this doesn't work in certain authentication modes. Something to look into, but not a priority.
   var ui = SpreadsheetApp.getUi();
   SpreadsheetApp.getUi().createAddonMenu() //Tells the UI to add a space to put items under the add-ons menu in docs
@@ -8,6 +12,7 @@ function onOpen(e) { //The 'e' there tells the system that this doesn't work in 
       .addSeparator()
       .addSubMenu(ui.createMenu('Advanced')
           .addItem('Completely clear sheet', 'completelyClearSheet')
+          .addItem('Get Spreadsheet ID', 'getSpreadsheetId')
           .addItem('Print organizations', 'printOrganizations')
           .addItem('Print networks', 'printNetworks')
           .addItem('Unblock clients on Results sheet', 'unblockClients')
@@ -25,7 +30,7 @@ function connectToMeraki() {
   var apikey = userData.apikey; //set our api key from above data
   if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;} //check the API key is longer than 20 characters
   
-  apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=connectToMeraki', 'noApiKeyNeeded'); //analytics
+  //apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=connectToMeraki', 'noApiKeyNeeded'); //analytics
   
   var merakiOrganizationId = userData.organizationId;
   var merakiClientsURL;
@@ -44,24 +49,29 @@ function connectToMeraki() {
   sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Results");
   var currentClients = clientList; //gets the clients that are currently connected.
   sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Approved clients");
-  var approvedClients = sheet.getRange('A2:A' + sheet.getLastRow()).getValues(); //gets the clients that are approved to connect.
+  var approvedClients = getApprovedClients(); //gets the clients that are approved to connect.
   sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Results");
   var unknownClients = new Array(); //this is the array that will hold the MAC addresses for clients we haven't approved
   var unknownClientsPrint = []; //this is the array that will be printed to the Results sheet
   var unknownClientsLineNum = new Array(); //this is the array that will hold the line numbers of the clients that aren't approved so we can get more info about each unknown client without another API call
   
   var numberOfUnknownDevices = 0; //assume that there are no unknown devices
+    
   for(i in currentClients.jsonResponse){
     var row = currentClients.jsonResponse[i].mac; //set the row to a mac address
     var duplicate = false; //assume every row is not a duplicate
+    
     for(j in approvedClients){
-      if(row == approvedClients[j]){ //if the row matches an entry on the approved clients list.
+      Logger.log(approvedClients[j][j].join());
+      if(row == approvedClients.indexOf(row)){ //if the row matches an entry on the approved clients list.
         duplicate = true; //mark it as a duplicate
       }
     }
-    if(!duplicate){ //if it's a duplicate,
+    if(!duplicate){ //if it's not a duplicate,
       unknownClients.push(row); //add it to unknownClients, and
       unknownClientsLineNum.push(i); //add the line number to unknownClientsLineNum
+      Logger.log('IS NOT DUPLICATE:')
+        Logger.log(row);
     }
   }
   

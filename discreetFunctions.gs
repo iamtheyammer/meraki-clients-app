@@ -1,95 +1,90 @@
-//3:25PM, 2/1/18
-function onOpen(e) { //The 'e' there tells the system that this doesn't work in certain authentication modes. Something to look into, but not a priority.
-  var ui = SpreadsheetApp.getUi();
-  SpreadsheetApp.getUi().createAddonMenu() //Tells the UI to add a space to put items under the add-ons menu in docs
-      .addItem('Start', 'connectToMeraki') 
-      .addItem('Block remaining clients', 'blockUnknownClients')
-      .addItem('Approve remaining clients', 'approveUnknownClients')
-      .addSeparator()
-      .addSubMenu(ui.createMenu('Advanced')
-          .addItem('Completely clear sheet', 'completelyClearSheet')
-          .addItem('Print organizations', 'printOrganizations')
-          .addItem('Print networks', 'printNetworks')
-          .addItem('Unblock clients on Results sheet', 'unblockClients')
-                  .addSubMenu(ui.createMenu('Custom API call')
-                              .addItem('Custom GET request', 'customAPICall')
-                              .addItem('Custom PUT request', 'customAPICallPut')))
-      .addToUi(); //Completes the add call.
+//10:44AM, 2/8/18
+/* This is the discreetFunctions code sheet. It's for functions that take in and put out data, like small processors. It's not for the main code flow. */
+
+function apiCall(url, apikey) {
+  Logger.log('Attempting an API call to ' + url + '.');
+  var APIheaders = {'X-Cisco-Meraki-API-Key': apikey}; //sets headers
+  var options = {'contentType':'application/json', 'method':'GET', 'headers':APIheaders};
+  var response = UrlFetchApp.fetch(url, options); //actual api call
+  Logger.log('API call succeeded. Parsing responses.');
+  var stringResponse = response.getContentText();
+  var jsonResponse = JSON.parse(stringResponse); //parses response as json
+  Logger.log('Completed API call to ' + url + '.');
+  return {'jsonResponse':jsonResponse, 'stringResponse':stringResponse};
 }
 
-function connectToMeraki() {
-  try {
-  var sheet = SpreadsheetApp.getActiveSheet();
-  var ui = SpreadsheetApp.getUi();
-  var userData = getUserInfo(); //grab the user's data: see discreetFunctions
-  var apikey = userData.apikey; //set our api key from above data
-  if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;} //check the API key is longer than 20 characters
-  
-  apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=connectToMeraki', 'noApiKeyNeeded'); //analytics
-  
-  var merakiOrganizationId = userData.organizationId;
-  var merakiClientsURL;
-  
-  var clientList = apiCall('https://api.meraki.com/api/v0/devices/' + userData.securityApplianceSerial + '/clients?timespan=' + userData.clientTimespan, apikey); //grab all clients connected to security appliance
-  var numberOfClients = clientList.jsonResponse.length;
-  
- /* for (var i = 0; i < numberOfClients; i++) {
-    merakiClientsURL = userData.clientsURL + '#q=' + encodeURIComponent(clientList.jsonResponse[i].mac);
-    range = sheet.getRange("A" + (i+2) + ":E" + (i+2));
-    cell = sheet.setActiveRange(range);
-    cell.setValues([[clientList.jsonResponse[i].description, clientList.jsonResponse[i].mac, clientList.jsonResponse[i].ip, clientList.jsonResponse[i].usage.recv/1000000 + '/' + clientList.jsonResponse[i].usage.sent/1000000, merakiClientsURL]]); 
-  }
-  This for loop prints out all client data.*/
-  
-  sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Results");
-  var currentClients = clientList; //gets the clients that are currently connected.
-  sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Approved clients");
-  var approvedClients = sheet.getRange('A2:A' + sheet.getLastRow()).getValues(); //gets the clients that are approved to connect.
-  sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Results");
-  var unknownClients = new Array(); //this is the array that will hold the MAC addresses for clients we haven't approved
-  var unknownClientsPrint = []; //this is the array that will be printed to the Results sheet
-  var unknownClientsLineNum = new Array(); //this is the array that will hold the line numbers of the clients that aren't approved so we can get more info about each unknown client without another API call
-  
-  var numberOfUnknownDevices = 0; //assume that there are no unknown devices
-  for(i in currentClients.jsonResponse){
-    var row = currentClients.jsonResponse[i].mac; //set the row to a mac address
-    var duplicate = false; //assume every row is not a duplicate
-    for(j in approvedClients){
-      if(row == approvedClients[j]){ //if the row matches an entry on the approved clients list.
-        duplicate = true; //mark it as a duplicate
-      }
-    }
-    if(!duplicate){ //if it's a duplicate,
-      unknownClients.push(row); //add it to unknownClients, and
-      unknownClientsLineNum.push(i); //add the line number to unknownClientsLineNum
-    }
-  }
-  
-  sheet.clear(); //reset the sheet and set the headings
-  sheet.getRange('A1').setValue('Description');
-  sheet.getRange('B1').setValue('MAC address');
-  sheet.getRange('C1').setValue('LAN IP');
-  sheet.getRange('D1').setValue('Data up/down in MB');
-  sheet.getRange('E1').setValue('Meraki dashboard URL');
-  //sheet.getRange(2, 1, unknownClients.length, 2).setValues(newData); //gets a selection. starts on row 2, column 1, with a length of the number of unknown clients, 2 wide
-   
-  /*for (var i = 0; i < unknownClients.length; i++) {
-    merakiClientsURL = userData.clientsURL + '#q=' + encodeURIComponent(unknownClients[i]);
-    unknownClientsPrint.push([unknownClients[i],merakiClientsURL]);
+function apiCallPut(url, apikey) {
+  Logger.log('Attempting an API call to ' + url + '.');
+  var APIheaders = {'X-Cisco-Meraki-API-Key': apikey}; //sets headers
+  var options = {'contentType':'application/json', 'method':'put', 'headers':APIheaders};
+  var response = UrlFetchApp.fetch(url, options); //actual api call
+  Logger.log('API call succeeded. Parsing responses.');
+  var stringResponse = response.getContentText();
+  var jsonResponse = JSON.parse(stringResponse); //parses response as json
+  Logger.log('Completed API call to ' + url + '.');
+  return;
+  return {'jsonResponse':jsonResponse, 'stringResponse':stringResponse};
+} //The only difference between the top and bottom functions is that apiCallPut is a PUT request whereas apiCall is a GET request.
 
-  }*/
+function apiCallPost(url, payload) {
+  Logger.log('Attempting an API call to ' + url + '.');
+  var options = {'contentType':'application/json', 'method':'post', 'payload':JSON.stringify(payload), 'muteHttpExceptions':true};
+  var response = UrlFetchApp.fetch(url, options); //actual api call
+  Logger.log('API call succeeded. Parsing responses.');
+  var stringResponse = response.getContentText();
+  Logger.log(stringResponse);
+  var jsonResponse = JSON.parse(stringResponse); //parses response as json
+  Logger.log('Completed API call to ' + url + '.');
+  return {'jsonResponse':jsonResponse, 'stringResponse':stringResponse};
+} //This function takes in a payload and not an API key. It's for reporting errors to the mismatch API.
+
+/* Using the apiCall function:
+the apiCall function is made so that you don't have to continuously copy and paste the code. Just set your API Key as a variable, and set your URL depending on what you need,
+and you're all set. It will return an object, from which you can get the response as a string and as JSON. Just ask for result.stringResponse or result.jsonResponse.
+Below is a function, that when called, logs the response as JSON and as a string. Uncomment it if you're interested.
+
+function testAPICall() {
   
-  for (var i = 0; i < unknownClientsLineNum.length; i++) {
-    merakiClientsURL = userData.clientsURL + '#q=' + encodeURIComponent(unknownClients[i]); //set up the URLs: encode the mac address so it's readable by meraki
-    unknownClientsPrint.push([clientList.jsonResponse[unknownClientsLineNum[i]].description, clientList.jsonResponse[unknownClientsLineNum[i]].mac, clientList.jsonResponse[unknownClientsLineNum[i]].ip, clientList.jsonResponse[unknownClientsLineNum[i]].usage.recv/1000 + '/' + clientList.jsonResponse[unknownClientsLineNum[i]].usage.sent/1000, merakiClientsURL]); 
-  }
+  var apikey = 'myapikey'; //set your API key. this can be set at the beginning of the document.
   
-  sheet.getRange(2, 1, unknownClients.length, 5).setValues(unknownClientsPrint); //get a range large enough for our data and paste the data in
-    
+  //As you can see, once the API key is set, just set the URL and call the function. So, for each call, we only need two lines of code.
+  var url = 'http://httpbin.org/get'; //set the API url.
+  var result = apiCall(url, apikey); //uses apiCall to make the actual api call, sending the URL and API key with the memberwise initalizer.
+  
+  //The below lines are not necessary, they just log the responses so you can see them.
+  Logger.log(result.stringResponse); //Logs the response as a string.
+  Logger.log(result.jsonResponse); //Logs the response as JSON.
+  
+} */
+
+function getUserInfo() {
+  try {
+  //find user organization
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('User data');
+  
+  var range = sheet.getRange('A2'); //grabs API Key
+  var apikey = range.getDisplayValue();
+  
+  var range = sheet.getRange('B2'); //grabs Organization ID
+  var organizationId = range.getDisplayValue();
+  
+  var range = sheet.getRange('C2'); //grabs Network ID
+  var networkId = range.getDisplayValue();
+  
+  var range = sheet.getRange('D2'); //grabs security appliance serial
+  var securityApplianceSerial = range.getDisplayValue();
+  
+  var range = sheet.getRange('E2'); //grabs timespan to list clients
+  var clientTimespan = range.getDisplayValue();
+  
+  var range = sheet.getRange('F2'); //grabs client dashboard link
+  var clientsURL = range.getDisplayValue();
+  
+  return {'apikey':apikey,'organizationId':organizationId,'networkId':networkId,'securityApplianceSerial':securityApplianceSerial,'clientTimespan':clientTimespan,'clientsURL':clientsURL};
   } catch(e) {
     var payload = {
        "id":"vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk",
-       "function":"connectToMeraki",
+       "function":"getUserInfo",
        "fileName":e.fileName,
        "lineNumber":e.lineNumber,
        "message":e.message,
@@ -98,96 +93,19 @@ function connectToMeraki() {
     SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message); 
   }
 }
+/* Using the getUserInfo function:
+Grabs the user's API key, organization ID and network ID. Doesn't require any variables. */
 
-function blockUnknownClients() {
+
+function verifyInfoWithUser(dataToVerify, errorIfNotVerified) {
   try {
-  var sheet = SpreadsheetApp.getActiveSheet();
   var ui = SpreadsheetApp.getUi();
-  var cell;
-  var range;
-  var userData = getUserInfo();
-  
-  apiCallPut('https://api.mismatch.io:8000/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=blockUnknownClients', 'noApiKeyNeeded'); //analytics
-  
-  var apikey = userData.apikey;
-  if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;}
-  
-  sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Results");
-  var unknownClients = sheet.getRange('B2:B' + sheet.getLastRow()).getValues(); //grab the mac addresses from the results sheet
-  sheet.getRange('F1').setValue('Device policy');
-  
-  var response = ui.alert('Are you sure you want to block all clients listed on this sheet?', 'You can press no below to remove clients you don\'t want to block.' , ui.ButtonSet.YES_NO);
-  if (response != ui.Button.YES) { 
-    ui.alert('Cancelling.');
-    return;
-  }
-  
-  for (i = 0; i < unknownClients.length; i++) {
-  //var unknownClientURI = encodeURIComponent(unknownClients[i]); //would encode the mac address but works ok as is
-  var response = apiCallPut('https://n126.meraki.com/api/v0/networks/' + userData.networkId + '/clients/' + unknownClients[i] + '/policy?timespan=2592000&devicePolicy=blocked', apikey); //call the api to block the client
-  range = sheet.getRange("F" + (i+2) + ":F" + (i+2)); //get the cell to print to
-  cell = sheet.setActiveRange(range); //set the cell as active
-  cell.setValue([['Blocked']]); //put data in the cell
-  Utilities.sleep(400); //wait 400 milliseconds to comply with meraki's 5 calls/second limit
-  }
-    
-  } catch(e) {
-    var payload = {
-       "id":"vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk",
-       "function":"connectToMeraki",
-       "fileName":e.fileName,
-       "lineNumber":e.lineNumber,
-       "message":e.message,
-    };
-    apiCallPost('https://api.mismatch.io/analytics/error', payload);
-    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message); 
-  }
-}
-
-function approveUnknownClients() {
-  var sheet = SpreadsheetApp.getActiveSheet();
-  var ui = SpreadsheetApp.getUi();
-
-  var userData = getUserInfo();
-  try {
-  apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=approveUnknownClients', 'noApiKeyNeeded'); //analytics
-  
-  sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Results").activate(); //visually switch sheets to Results
-  var unknownClients = sheet.getRange('B2:B' + sheet.getLastRow()).getValues(); //grab the mac addresses
-  
-  var response = ui.alert('Are you sure you want to approve all clients listed on this sheet?', 'This will add all MAC addresses on this sheet to your approved devices list.' , ui.ButtonSet.YES_NO);
+  var response = ui.alert('Is this correct?', dataToVerify , ui.ButtonSet.YES_NO);
   if (response != ui.Button.YES) {
-    ui.alert('Cancelling.');
+    ui.alert(errorIfNotVerified);
     return;
   }
-  sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Approved clients");
-  
-  for (i = 0; i < unknownClients.length; i++) {
-  sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Approved clients"); //switch to approved clients
-  sheet.appendRow([unknownClients[i].join()]); //turn the mac addresses into strings
-  sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Results").getRange("F" + (i+2) + ":F" + (i+2)); //select cell to write to
-  var cell = sheet.activate(); //activate it
-  cell.setValue([['Added to allowed list.']]); //write to it
-  }
-  
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients');
-  var data = sheet.getDataRange().getValues();
-  var newData = new Array();
-  for(i in data){
-    var row = data[i];
-    var duplicate = false;
-    for(j in newData){
-      if(row.join() == newData[j].join()){
-        duplicate = true;
-      }
-    }
-    if(!duplicate){
-      newData.push(row);
-    }
-  }
-  sheet.clearContents();
-  sheet.getRange(1, 1, newData.length, newData[0].length).setValues(newData); //above code (whole paragraph) finds and removes duplicates in the approved clients list
-  
+  Logger.log(dataToVerify + ' has been verified.');
   } catch(e) {
     var payload = {
        "id":"vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk",
@@ -199,4 +117,84 @@ function approveUnknownClients() {
     apiCallPost('https://api.mismatch.io/analytics/error', payload);
     SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message); 
   }
+}
+/* Using the verifyInfoWithUser function:
+This function takes in some dataToVerify and an errorIfNotVerified. It will prompt the user, and ask if dataToVerify is correct. If the user responds with 
+anything but a yes, it will throw up errorIfNotVerified. */
+
+/* DEPRECATED DEPRECATED DEPRECATED
+function resetSheet() {
+  var sheet = SpreadsheetApp.getActiveSheet();
+  
+  switchSheets('Results');
+  sheet.clearContents();
+  
+  var cell = sheet.getRange('A1');
+  cell.setValue('Client name');
+  var cell = sheet.getRange('B1');
+  cell.setValue('Mac Address');
+  var cell = sheet.getRange('C1');
+  cell.setValue('Lan IP');
+  var cell = sheet.getRange('D1');
+  cell.setValue('Usage down/up in GB')
+  var cell = sheet.getRange('E1');
+  cell.setValue('Meraki dashboard URL')
+
+}
+
+ Using the resetSheet function:
+This function is called directly from the menu, so nothing comes in and nothing is returned. It can also be called from inside of the code. */
+
+function switchSheets(sheetName) {
+ try {
+ var newSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+ if (newSheet == null || newSheet == undefined) {
+   SpreadsheetApp.getActiveSpreadsheet().insertSheet(sheetName);
+ }
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+  newSheet.activate();
+  return newSheet;
+  //newSheet.activate();
+ } catch(e) {
+    var payload = {
+       "id":"vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk",
+       "function":"connectToMeraki",
+       "fileName":e.fileName,
+       "lineNumber":e.lineNumber,
+       "message":e.message,
+    };
+    apiCallPost('https://api.mismatch.io/analytics/error', payload);
+    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message); 
+  }
+}
+
+/* Using the switchSheets function:
+This function makes a new sheet or switches to a sheet with a name you pass in via memberwise initalizer. If there's no sheet with the name you specify, it will
+create a new sheet. It will return the current sheet object, so use a statement like:
+var sheet = switchSheets('sheetName');
+to make sure that you get the active sheet object. then, you'll be able to do operations like:
+sheet.clear();
+*/
+
+function getApprovedClients() {
+ 
+  var indexingSheetIds = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('A2:A' + SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getLastRow()).getValues();
+  Logger.log(indexingSheetIds);
+  var indexingSheetNames = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('B2:B' + SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getLastRow()).getValues();
+  Logger.log(indexingSheetNames);
+  var indexingSheetFirstCells = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('C2:C' + SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getLastRow()).getValues();
+  Logger.log(indexingSheetFirstCells);
+  var approvedClients = [];
+  
+  for (var i = 0; i < indexingSheetIds.length; i++) {
+    Logger.log(i);
+    var spreadSheet = SpreadsheetApp.openById(indexingSheetIds[i].join());  //want to open by link
+    var sheet = spreadSheet.getSheetByName(indexingSheetNames[i].join());
+    //spreadSheet.getSheetByName(indexingSheetNames).getRange(indexingSheetFirstCells + ':' + spreadSheet.getLastRow());
+    //var approvedClients = (spreadSheet.getSheetByName(indexingSheetNames).getRange(indexingSheetFirstCells + ':' + indexingSheetFirstCells[i].slice(0,1) + spreadSheet.getSheetByName(indexingSheetNames).getLastRow()).getValues());
+    approvedClients.push(sheet.getRange(indexingSheetFirstCells[i].join() + ':' + indexingSheetFirstCells[i].join().slice(0,1) + spreadSheet.getSheetByName(indexingSheetNames[i]).getLastRow()).getValues());
+
+  }
+  Logger.log(approvedClients);
+ return approvedClients;
 }
