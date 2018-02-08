@@ -1,4 +1,4 @@
-//12:20PM, 2/8/18
+//2:28PM, 2/8/18
 function onInstall(e) {
  onOpen(e); 
 }
@@ -167,18 +167,22 @@ function approveUnknownClients() {
   if (response != ui.Button.YES) {
     ui.alert('Cancelling.');
     return;
+    
   }
-  sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Approved clients");
-  
+   
+  var sheetUrl = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('A2').getValues();
+  var sheetName = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('B2').getValues();
+  //var sheetCell = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('C2').getValues();
+  var writingSheet = SpreadsheetApp.openByUrl(sheetUrl).getSheetByName(sheetName);
   for (i = 0; i < unknownClients.length; i++) {
-  sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Approved clients"); //switch to approved clients
+  sheet = writingSheet;
   sheet.appendRow([unknownClients[i].join()]); //turn the mac addresses into strings
   sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Results").getRange("F" + (i+2) + ":F" + (i+2)); //select cell to write to
   var cell = sheet.activate(); //activate it
   cell.setValue([['Added to allowed list.']]); //write to it
   }
   
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients');
+  sheet = writingSheet;
   var data = sheet.getDataRange().getValues();
   var newData = new Array();
   for(i in data){
