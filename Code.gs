@@ -30,7 +30,7 @@ function connectToMeraki() {
   var apikey = userData.apikey; //set our api key from above data
   if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;} //check the API key is longer than 20 characters
   
-  //apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=connectToMeraki', 'noApiKeyNeeded'); //analytics
+  apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=connectToMeraki', 'noApiKeyNeeded'); //analytics
   
   var merakiOrganizationId = userData.organizationId;
   var merakiClientsURL;
@@ -74,11 +74,12 @@ function connectToMeraki() {
   }
   
   sheet.clear(); //reset the sheet and set the headings
-  sheet.getRange('A1').setValue('Description');
+  sheet.getRange('A1:E1').setValues([['Description', 'MAC address', 'LAN IP', 'Data down/up in MB', 'Meraki dashboard URL']]);
+  /*sheet.getRange('A1').setValue('Description');
   sheet.getRange('B1').setValue('MAC address');
   sheet.getRange('C1').setValue('LAN IP');
-  sheet.getRange('D1').setValue('Data up/down in MB');
-  sheet.getRange('E1').setValue('Meraki dashboard URL');
+  sheet.getRange('D1').setValue('Data down/up in MB');
+  sheet.getRange('E1').setValue('Meraki dashboard URL');*/
   //sheet.getRange(2, 1, unknownClients.length, 2).setValues(newData); //gets a selection. starts on row 2, column 1, with a length of the number of unknown clients, 2 wide
    
   /*for (var i = 0; i < unknownClients.length; i++) {
@@ -93,9 +94,11 @@ function connectToMeraki() {
   }
     if (unknownClientsPrint.length >= 1) { //if there are no unknown clients
       sheet.getRange(2, 1, unknownClients.length, 5).setValues(unknownClientsPrint); //get a range large enough for our data and paste the data in
+      sheet.activate()
 	  //print out the unknown clients
     } else { //otherwise,
-		ui.alert('Congratulations!', 'You don\'t have any un-approved devices! (if you think you do, you might want to check the \'Client timespan\' setting in the User data sheet. you can also check all of the sheets that make up your approved devices list and check those as well.)', ui.ButtonSet.OK); //congratulate the user that their network is in pristine perfectness
+      sheet.activate();
+      ui.alert('Congratulations!', 'You don\'t have any un-approved devices! (if you think you do, you might want to check the \'Client timespan\' setting in the User data sheet. you can also check all of the sheets that make up your approved devices list and check those as well.)', ui.ButtonSet.OK); //congratulate the user that their network is in pristine perfectness
     }
   } catch(e) {
     var payload = {
