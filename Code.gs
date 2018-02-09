@@ -145,7 +145,7 @@ function blockUnknownClients() {
   } catch(e) {
     var payload = {
        "id":"vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk",
-       "function":"connectToMeraki",
+       "function":"blockUnknownClients",
        "fileName":e.fileName,
        "lineNumber":e.lineNumber,
        "message":e.message,
@@ -206,7 +206,7 @@ function approveUnknownClients() {
   } catch(e) {
     var payload = {
        "id":"vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk",
-       "function":"connectToMeraki",
+       "function":"approveUnknownClients",
        "fileName":e.fileName,
        "lineNumber":e.lineNumber,
        "message":e.message,
