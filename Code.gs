@@ -1,6 +1,7 @@
-//2:56PM, 2/8/18
+//12:17AM, 2/10/18
 function onInstall(e) {
  onOpen(e); 
+ initializeSpreadsheet();
 }
 
 function onOpen(e) { //The 'e' there tells the system that this doesn't work in certain authentication modes. Something to look into, but not a priority.
@@ -16,6 +17,7 @@ function onOpen(e) { //The 'e' there tells the system that this doesn't work in 
           .addItem('Print organizations', 'printOrganizations')
           .addItem('Print networks', 'printNetworks')
           .addItem('Unblock clients on Results sheet', 'unblockClients')
+          .addItem('Initialize spreadsheet', 'initializeSpreadsheet')
                   .addSubMenu(ui.createMenu('Custom API call')
                               .addItem('Custom GET request', 'customAPICall')
                               .addItem('Custom PUT request', 'customAPICallPut')))

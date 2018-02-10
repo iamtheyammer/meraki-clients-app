@@ -1,4 +1,4 @@
-//12:21PM, 2/8/18
+//12:17AM, 2/10/18
 /* This is the discreetFunctions code sheet. It's for functions that take in and put out data, like small processors. It's not for the main code flow. */
 
 function apiCall(url, apikey) {
@@ -200,4 +200,37 @@ function getApprovedClients() {
   apiCallPost('https://api.mismatch.io/analytics/error', payload);
   SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message); 
 }
+}
+
+function initializeSpreadsheet() {
+  var ui = SpreadsheetApp.getUi();
+  var response = ui.alert('Do you want to initalize this sheet?', 'That will completely erase every sheet on this document.', ui.ButtonSet.OK_CANCEL);
+  if (response != ui.Button.OK) {
+   ui.alert('Cancelling.');
+   return;
+  }
+  Logger.log(SpreadsheetApp.getActiveSpreadsheet().getSheets());
+  if (SpreadsheetApp.getActiveSpreadsheet().getSheetName() == 'Results' || SpreadsheetApp.getActiveSpreadsheet().getSheetName() == 'Approved clients' || SpreadsheetApp.getActiveSpreadsheet().getSheetName() == 'User data' || SpreadsheetApp.getActiveSpreadsheet().getSheetName() == 'Advanced output') {
+    var response = ui.alert('You\'re already set up!', 'If you\'d like to re-initialize the sheet, press OK below.', ui.ButtonSet.OK_CANCEL);
+    if (response != ui.Button.OK) {
+      ui.alert('Cancelling.');
+      return;
+    } else {
+      SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Results').activate();
+      var currentSheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
+      for (var i = 0; i < (currentSheets.length -= 1); i++)
+        SpreadsheetApp.getActiveSpreadsheet().deleteSheet(currentSheets[i])
+    }
+  }
+  
+  
+  var readingSpreadSheet = SpreadsheetApp.openById('1STQQAHvW9Re4vmFnHRnu6PVjX5TfdUFUVaH8jDba5LE');
+  var initSheet = SpreadsheetApp.getActiveSpreadsheet();
+  initSheet.getActiveSheet().setName('Results').getRange(readingSpreadSheet.getSheetByName('Results').getDataRange().getA1Notation()).setValues(readingSpreadSheet.getSheetByName('Results').getDataRange().getValues());
+  initSheet.insertSheet('Approved clients').getRange(readingSpreadSheet.getSheetByName('Approved clients').getDataRange().getA1Notation()).setValues(readingSpreadSheet.getSheetByName('Approved clients').getDataRange().getValues());
+  initSheet.getSheetByName('Approved clients').getRange('A2:D').setBackground('yellow');
+  initSheet.insertSheet('User data').getRange(readingSpreadSheet.getSheetByName('User data').getDataRange().getA1Notation()).setValues(readingSpreadSheet.getSheetByName('User data').getDataRange().getValues());
+  initSheet.getSheetByName('User data').getRange('A2:F2').setBackground('yellow');
+  initSheet.insertSheet('Advanced output').getRange(readingSpreadSheet.getSheetByName('Advanced output').getDataRange().getA1Notation()).setValues(readingSpreadSheet.getSheetByName('Advanced output').getDataRange().getValues());
+  initSheet.getSheetByName('Results').activate();
 }
