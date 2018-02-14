@@ -22,8 +22,10 @@ body {font-size:16px;}
   <div class="w3-bar-block">
     <a href="#" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Home</a> 
     <a href="#install" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Install</a> 
-    <a href="#usage" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Usage</a> 
+    <a href="#usage" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Usage</a>
+    <a href="#pricing" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Pricing</a> 
     <a href="#privacy" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Privacy</a> 
+	<a href="#emails" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Emails</a>
     <a href="#contact" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Contact</a>
   </div>
 </nav>
@@ -56,7 +58,7 @@ body {font-size:16px;}
     </p>
   </div>
 
-  <!-- Services -->
+  <!-- Install -->
   <div class="w3-container" id="install" style="margin-top:75px">
     <h1 class="w3-xxxlarge w3-text-red"><b>Install.</b></h1>
     <hr style="width:50px;border:5px solid red" class="w3-round">
@@ -64,23 +66,23 @@ body {font-size:16px;}
     <p>The add-on is not available to the public yet. Shoot an email to mails@mismatch.io and we'll get in touch! It should be available Summer 2018. If you're a beta tester, the instructions follow: 
     </p>
     <ol>
-		<li>Generate a csv of all of your APs and switches with MAC addresses and upload it to google sheets.</li>
+	<li>Generate a csv of all of your APs and switches with MAC addresses and upload it to google sheets.</li>
 
-		<li>Generate a list of all of your approved clients, in the form of MAC addresses, formatted like this: 11:22:33:44:55:66 and upload it to google sheets. (if you need to add :'s to your mac addresses, click <a href="https://github.com/iamtheyammer/format-mac-addresses-excel">here</a>.)</li>
+	<li>Generate a list of all of your approved clients, in the form of MAC addresses, formatted like this: 11:22:33:44:55:66 and upload it to google sheets. (if you need to add :'s to your mac addresses, click <a href="https://github.com/iamtheyammer/format-mac-addresses-excel">here</a>.)</li>
 
-		<li>Install the add-on to google sheets. Click <a href="https://chrome.google.com/webstore/detail/merakiblocki/gfahbfffpkbhomhgmnnlbbonfkgdjmdf">here</a> to add it.</li>
+	<li>Install the add-on to google sheets. Click <a href="https://chrome.google.com/webstore/detail/merakiblocki/gfahbfffpkbhomhgmnnlbbonfkgdjmdf">here</a> to add it.</li>
 
-		<li>Go ahead, initialise the spreadsheet and follow the instructions on the results sheet. Right now, I don't support multiple networks per spreadsheet, so if you need to scan more networks you might need more sheets. (to initialise more spreadsheets, Add-ons, MerakiBlocki, Advanced, Initialise sheet)</li>
+	<li>Go ahead, initialise the spreadsheet and follow the instructions on the results sheet. Right now, I don't support multiple networks per spreadsheet, so if you need to scan more networks you might need more sheets. (to initialise more spreadsheets, Add-ons, MerakiBlocki, Advanced, Initialise sheet)</li>
 
-		<li>Head on over to the results sheet, go to Add-ons, MerakiBlocki, Start</li>
+	<li>Head on over to the results sheet, go to Add-ons, MerakiBlocki, Start</li>
 
-		<li>Wait and watch the magic happen!</li>
+	<li>Wait and watch the magic happen!</li>
 
-		<li>All of the mac addresses that aren't present on your approved clients sheets will be printed out before your eyes!</li>
+	<li>All of the mac addresses that aren't present on your approved clients sheets will be printed out before your eyes!</li>
 
-		<li>If you want to take action on them, you can Block all remaining clients or Approve all remaining clients. There's even a function to set all of the policies to normal, but that's pretty rare use.</li>
+	<li>If you want to take action on them, you can Block all remaining clients or Approve all remaining clients. There's even a function to set all of the policies to normal, but that's pretty rare use.</li>
 
-		<li>If you want to approve/block only some clients to your approved sheet, just remove the mac addresses from the lines you don't want to approve/block.</li>
+	<li>If you want to approve/block only some clients to your approved sheet, just remove the mac addresses from the lines you don't want to approve/block.</li>
 
 	</ol>
   </div>
@@ -156,14 +158,24 @@ body {font-size:16px;}
 </li>
 </ul>
 
+<!-- Pricing -->
+  <div class="w3-container" id="pricing" style="margin-top:75px">
+    <h1 class="w3-xxxlarge w3-text-red"><b>Pricing.</b></h1>
+    <hr style="width:50px;border:5px solid red" class="w3-round">
+    <p>MerakiBlocki is currently in a free beta.</p>
+    <p>Eventually, a license key will be required to use MerakiBlocki. We haven't decided whether MerakiBlocki will be charged based on usage or monthly, but a free trial will most likely be available. For more information, sign up for occasional emails <a href="#emails" onclick="w3_close()" class="">here</a>.
+    </p>
+  </div>
+	
  <!-- Privacy -->
   <div class="w3-container" id="privacy" style="margin-top:75px">
     <h1 class="w3-xxxlarge w3-text-red"><b>Privacy.</b></h1>
     <hr style="width:50px;border:5px solid red" class="w3-round">
-    <p>MerakiBlocki sends analytics and erros to mismatch.io, the developers.</p>
+    <p>MerakiBlocki sends analytics and errors to mismatch.io, the developers.</p>
     <p>MerakiBlocki sends the function ran to mismatch.io when a function is ran from the menu. It has no personal data at all. If you encounter an error, MerakiBlocki will send the error text, file name and line number in which the error occured. All analytics/error reporting is done over SSL/TLS and the information is only for my curiosity and bug fixing. It will never be sold or given to anyone.
     </p>
   </div>
+  
   <!-- Packages / Pricing Tables
   <div class="w3-container" id="packages" style="margin-top:75px">
     <h1 class="w3-xxxlarge w3-text-red"><b>Packages.</b></h1>
@@ -209,31 +221,27 @@ body {font-size:16px;}
     </div>
   </div>
   -->
-  <!-- Contact
-  <div class="w3-container" id="contact" style="margin-top:75px">
-    <h1 class="w3-xxxlarge w3-text-red"><b>Contact.</b></h1>
+  <!-- Contact -->
+  <div class="w3-container" id="emails" style="margin-top:75px">
+    <h1 class="w3-xxxlarge w3-text-red"><b>Emails.</b></h1>
     <hr style="width:50px;border:5px solid red" class="w3-round">
-    <p>Do you want us to style your home? Fill out the form and fill me in with the details :) We love meeting new people!</p>
-    <form action="/action_page.php" target="_blank">
+    <p>Want updates about MerakiBlocki?</p>
+    <form action="https://merakiblocki.us17.list-manage.com/subscribe/post?u=3e28c5bdb83016d20d8fb05e0&amp;id=5a458bb9f5" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
       <div class="w3-section">
-        <label>Name</label>
-        <input class="w3-input w3-border" type="text" name="Name" required>
+        <label>First name</label>
+        <input class="w3-input w3-border" type="text" name="FNAME" required>
+      </div>
+     <div class="w3-section">
+        <label>Last name</label>
+        <input class="w3-input w3-border" type="text" name="LNAME" required>
       </div>
       <div class="w3-section">
         <label>Email</label>
-        <input class="w3-input w3-border" type="text" name="Email" required>
-      </div>
-      <div class="w3-section">
-        <label>Message</label>
-        <input class="w3-input w3-border" type="text" name="Message" required>
+        <input class="w3-input w3-border" type="text" name="EMAIL" required>
       </div>
       <button type="submit" class="w3-button w3-block w3-padding-large w3-red w3-margin-bottom">Send Message</button>
     </form>  
   </div>
--->
-<!-- End page content
-</div>-->
-
 
  <!-- Contact -->
   <div class="w3-container" id="contact" style="margin-top:75px">
@@ -243,8 +251,11 @@ body {font-size:16px;}
     <p>Shoot me an email! mails@mismatch.io.
     </p>
   </div>
+</div>
+<!-- End page content -->
+
 <!-- W3.CSS Container -->
-<div class="w3-light-grey w3-container w3-padding-32" style="margin-top:75px;padding-right:58px"><p class="w3-right">Made by <a href="https://mismatch.io" title="W3.CSS" target="_blank" class="w3-hover-opacity">mismatch.io</a>. Dedicated to Paul and Chris.</p></div>
+<div class="w3-light-grey w3-container w3-padding-32" style="margin-top:75px;padding-right:58px"><p class="w3-right">Made by <a href="https://mismatch.io" title="Mismatch.io" target="_blank" class="w3-hover-opacity">mismatch.io</a>. Dedicated to Paul and Chris.</p></div>
 
 <script>
 // Script to open and close sidebar
