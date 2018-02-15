@@ -66,19 +66,19 @@ body {font-size:16px;}
     <p>The add-on is not available to the public yet. Shoot an email to mails@mismatch.io and we'll get in touch! It should be available Summer 2018. If you're a beta tester, the instructions follow: 
     </p>
     <ol>
-	<li>Generate a csv of all of your APs and switches with MAC addresses and upload it to google sheets.</li>
+	<li>Generate a csv of all of your APs and switches with MAC addresses and upload it to Google Sheets. Since it looks for all clients connected to your Security appliance, your APs and switches come up.</li>
 
 	<li>Generate a list of all of your approved clients, in the form of MAC addresses, formatted like this: 11:22:33:44:55:66 and upload it to google sheets. (if you need to add :'s to your mac addresses, click <a href="https://github.com/iamtheyammer/format-mac-addresses-excel">here</a>.)</li>
 
-	<li>Install the add-on to google sheets. Click <a href="https://chrome.google.com/webstore/detail/merakiblocki/gfahbfffpkbhomhgmnnlbbonfkgdjmdf">here</a> to add it.</li>
+	<li>Install the add-on to google sheets.</li>
 
-	<li>Go ahead, initialise the spreadsheet and follow the instructions on the results sheet. Right now, I don't support multiple networks per spreadsheet, so if you need to scan more networks you might need more sheets. (to initialise more spreadsheets, Add-ons, MerakiBlocki, Advanced, Initialise sheet)</li>
+	<li>Go ahead, initialise the spreadsheet and follow the instructions on the results sheet. Right now, I don't support multiple networks per spreadsheet, so if you need to scan more networks you might need more sheets. (to initialise more spreadsheets, Add-ons, MerakiBlocki, Advanced, Initialise spreadsheet)</li>
 
 	<li>Head on over to the results sheet, go to Add-ons, MerakiBlocki, Start</li>
 
 	<li>Wait and watch the magic happen!</li>
 
-	<li>All of the mac addresses that aren't present on your approved clients sheets will be printed out before your eyes!</li>
+	<li>All of the MAC addresses that aren't present on your approved clients sheets will be printed out before your eyes!</li>
 
 	<li>If you want to take action on them, you can Block all remaining clients or Approve all remaining clients. There's even a function to set all of the policies to normal, but that's pretty rare use.</li>
 
@@ -120,7 +120,7 @@ body {font-size:16px;}
 <li>Just erases your sheet (sheet, not spreadsheet).</li>
 </ul>
 </li>
-<li>Print organizations
+<li>Print organisations
 <ul>
 <li>Prints organisations, mainly for finding your Organisation ID.</li>
 </ul>
@@ -239,6 +239,10 @@ body {font-size:16px;}
         <label>Email</label>
         <input class="w3-input w3-border" type="text" name="EMAIL" required>
       </div>
+	  <div id="mce-responses">
+	  		<div class="response" id="mce-error-response" style="display:none"></div>
+	  		<div class="response" id="mce-success-response" style="display:none"></div>
+	  	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
       <button type="submit" class="w3-button w3-block w3-padding-large w3-red w3-margin-bottom">Sign up</button>
     </form>  
   </div>
