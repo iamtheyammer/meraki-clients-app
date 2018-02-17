@@ -1,4 +1,4 @@
-//12:17AM, 2/10/18
+//9:43AM, 2/17/18
 /* This is the discreetFunctions code sheet. It's for functions that take in and put out data, like small processors. It's not for the main code flow. */
 
 function apiCall(url, apikey) {
@@ -44,43 +44,91 @@ and you're all set. It will return an object, from which you can get the respons
 Below is a function, that when called, logs the response as JSON and as a string. Uncomment it if you're interested.
 
 function testAPICall() {
-  
+
   var apikey = 'myapikey'; //set your API key. this can be set at the beginning of the document.
-  
+
   //As you can see, once the API key is set, just set the URL and call the function. So, for each call, we only need two lines of code.
   var url = 'http://httpbin.org/get'; //set the API url.
   var result = apiCall(url, apikey); //uses apiCall to make the actual api call, sending the URL and API key with the memberwise initalizer.
-  
+
   //The below lines are not necessary, they just log the responses so you can see them.
   Logger.log(result.stringResponse); //Logs the response as a string.
   Logger.log(result.jsonResponse); //Logs the response as JSON.
-  
+
 } */
 
 function getUserInfo() {
   try {
+    Logger.log('begin get user info');
+  var ui = SpreadsheetApp.getUi();
   //find user organization
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('User data');
-  
+
   var range = sheet.getRange('A2'); //grabs API Key
   var apikey = range.getDisplayValue();
-  
+
   var range = sheet.getRange('B2'); //grabs Organization ID
   var organizationId = range.getDisplayValue();
-  
+
   var range = sheet.getRange('C2'); //grabs Network ID
   var networkId = range.getDisplayValue();
-  
+
   var range = sheet.getRange('D2'); //grabs security appliance serial
   var securityApplianceSerial = range.getDisplayValue();
-  
+
   var range = sheet.getRange('E2'); //grabs timespan to list clients
   var clientTimespan = range.getDisplayValue();
-  
+
   var range = sheet.getRange('F2'); //grabs client dashboard link
   var clientsURL = range.getDisplayValue();
-  
-  return {'apikey':apikey,'organizationId':organizationId,'networkId':networkId,'securityApplianceSerial':securityApplianceSerial,'clientTimespan':clientTimespan,'clientsURL':clientsURL};
+
+  var range = sheet.getRange('G2'); //grabs user license Key
+  var licenseKey = range.getDisplayValue();
+  var range = sheet.getRange('H2'); //grabs user license email
+  var licenseEmail = range.getDisplayValue();
+  var verificationResponse = apiCall('https://api.mismatch.io/licensing/verify?licenseKey=' + licenseKey + '&app=merakiApp&email=' + licenseEmail, 'noAPIKeyNeeded').jsonResponse;
+  var response = verificationResponse[0];
+  var returning = {'apikey':apikey,'organizationId':organizationId,'networkId':networkId,'securityApplianceSerial':securityApplianceSerial,'clientTimespan':clientTimespan,'clientsURL':clientsURL,'licenseValidity':licenseValidity,'licenseMaxClients':licenseMaxClients,'licenseType':response.licenseType};
+  if (!response) {
+      Logger.log(verificationResponse.licenseType);
+      Logger.log(verificationResponse.email);
+      var licenseValidity = false;
+      var licenseMaxClients = -2;
+      SpreadsheetApp.getActiveSpreadsheet().getSheetByName('User data').getRange("G3").setValue('Invalid license.');
+      ui.alert('Invalid license.', verificationResponse.message, ui.ButtonSet.OK);
+      return returning;
+  } else {
+    if (response.licenseType == 'basic' && response.email == licenseEmail) {
+      var licenseValidity = true;
+      var licenseMaxClients = response.licenseMaxClients;
+      SpreadsheetApp.getActiveSpreadsheet().getSheetByName('User data').getRange("G3").setValue('Valid - ' + response.licenseType + ' license. Thank you for playing fair.');
+      Logger.log('BASIC LICENSE');
+    } else if (response.licenseType == 'pro' && response.email == licenseEmail) {
+      var licenseValidity = true;
+      var licenseMaxClients = response.licenseMaxClients;
+      Logger.log('PRO LICENSE');
+      SpreadsheetApp.getActiveSpreadsheet().getSheetByName('User data').getRange("G3").setValue('Valid - ' + response.licenseType + ' license. Thank you for playing fair.');
+    } else if (response.licenseType == 'unlimited' && response.email == licenseEmail) {
+      var licenseValidity = true;
+      var licenseMaxClients = response.licenseMaxClients;
+      SpreadsheetApp.getActiveSpreadsheet().getSheetByName('User data').getRange("G3").setValue('Valid - ' + response.licenseType + ' license. Thank you for playing fair.');
+      Logger.log('UNLIMITED LICENSE');
+    } else if (response.licenseType == 'expired') {
+      var licenseValidity = false;
+      var licenseMaxClients = -1;
+      SpreadsheetApp.getActiveSpreadsheet().getSheetByName('User data').getRange("G3").setValue('Expired license.');
+      Logger.log('EXPIRED LICENSE');
+    } else {
+      Logger.log(response.licenseType);
+      Logger.log(response.email);
+      var licenseValidity = false;
+      var licenseMaxClients = -2;
+      SpreadsheetApp.getActiveSpreadsheet().getSheetByName('User data').getRange("G3").setValue('Invalid license.');
+      ui.alert('Something\'s wrong with your license.', 'It wasn\'t specifically expired, so it\'s very possible that your license and email don\'t match. Or it\'s possible your key doesn\'t exist. Check them and try again.', ui.ButtonSet.OK)
+    }
+  }
+    Logger.log('end get user info');
+    return returning;
   } catch(e) {
     var payload = {
        "id":"vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk",
@@ -90,7 +138,7 @@ function getUserInfo() {
        "message":e.message,
     };
     apiCallPost('https://api.mismatch.io/analytics/error', payload);
-    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message); 
+    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message);
   }
 }
 /* Using the getUserInfo function:
@@ -115,20 +163,20 @@ function verifyInfoWithUser(dataToVerify, errorIfNotVerified) {
        "message":e.message,
     };
     apiCallPost('https://api.mismatch.io/analytics/error', payload);
-    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message); 
+    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message);
   }
 }
 /* Using the verifyInfoWithUser function:
-This function takes in some dataToVerify and an errorIfNotVerified. It will prompt the user, and ask if dataToVerify is correct. If the user responds with 
+This function takes in some dataToVerify and an errorIfNotVerified. It will prompt the user, and ask if dataToVerify is correct. If the user responds with
 anything but a yes, it will throw up errorIfNotVerified. */
 
 /* DEPRECATED DEPRECATED DEPRECATED
 function resetSheet() {
   var sheet = SpreadsheetApp.getActiveSheet();
-  
+
   switchSheets('Results');
   sheet.clearContents();
-  
+
   var cell = sheet.getRange('A1');
   cell.setValue('Client name');
   var cell = sheet.getRange('B1');
@@ -164,7 +212,7 @@ function switchSheets(sheetName) {
        "message":e.message,
     };
     apiCallPost('https://api.mismatch.io/analytics/error', payload);
-    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message); 
+    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message);
   }
 }
 
@@ -178,16 +226,19 @@ sheet.clear();
 
 function getApprovedClients() {
 	try {
+      Logger.log('starting approved clients scan');
 	var indexingSheetUrls = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('A2:A' + SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getLastRow()).getValues(); //get the URLs of all the sheets to index for the approved clients list
   var indexingSheetNames = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('B2:B' + SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getLastRow()).getValues(); //get the sheet names of all the sheets to index for the approved clients list
   var indexingSheetFirstCells = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('C2:C' + SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getLastRow()).getValues(); //get the first cells of all the sheets to index for the approved clients list
   var approvedClients = [];
-  
+  var approvedTest = [];
+
   for (var i = 0; i < indexingSheetUrls.length; i++) {
 	var spreadSheet = SpreadsheetApp.openByUrl(indexingSheetUrls[i].join()); //open the i-st spreadsheet
     var sheet = spreadSheet.getSheetByName(indexingSheetNames[i].join()); //open the sheet inside of aforementioned spreadsheet
-    approvedClients.push(sheet.getRange(indexingSheetFirstCells[i].join() + ':' + indexingSheetFirstCells[i].join().slice(0,1) + spreadSheet.getSheetByName(indexingSheetNames[i]).getLastRow()).getValues()); //add all of the mac addresses on that sheet to the approved clients variable
+    approvedClients = approvedClients.concat(sheet.getRange(indexingSheetFirstCells[i].join() + ':' + indexingSheetFirstCells[i].join().slice(0,1) + spreadSheet.getSheetByName(indexingSheetNames[i]).getLastRow()).getValues()); //add all of the mac addresses on that sheet to the approved clients variable
   }
+      Logger.log('approved clients scan done.');
   return approvedClients; //retunr our final product
 } catch(e) { //I feel like this script might have a high chance for error, so I better add proper error reporting.
   var payload = {
@@ -198,9 +249,10 @@ function getApprovedClients() {
      "message":e.message,
   };
   apiCallPost('https://api.mismatch.io/analytics/error', payload);
-  SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message); 
+  SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message);
 }
 }
+//[[ [MAC], [MAC], [MAC] ]]
 
 function initializeSpreadsheet() {
   var ui = SpreadsheetApp.getUi();
@@ -222,8 +274,8 @@ function initializeSpreadsheet() {
         SpreadsheetApp.getActiveSpreadsheet().deleteSheet(currentSheets[i])
     }
   }
-  
-  
+
+
   var readingSpreadSheet = SpreadsheetApp.openById('1STQQAHvW9Re4vmFnHRnu6PVjX5TfdUFUVaH8jDba5LE');
   var initSheet = SpreadsheetApp.getActiveSpreadsheet();
   initSheet.getActiveSheet().setName('Results').getRange(readingSpreadSheet.getSheetByName('Results').getDataRange().getA1Notation()).setValues(readingSpreadSheet.getSheetByName('Results').getDataRange().getValues());
