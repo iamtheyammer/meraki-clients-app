@@ -1,13 +1,13 @@
-//9:43AM, 2/17/18
+//12:17AM, 2/10/18
 function onInstall(e) {
- onOpen(e);
+ onOpen(e); 
  initializeSpreadsheet();
 }
 
 function onOpen(e) { //The 'e' there tells the system that this doesn't work in certain authentication modes. Something to look into, but not a priority.
   var ui = SpreadsheetApp.getUi();
   SpreadsheetApp.getUi().createAddonMenu() //Tells the UI to add a space to put items under the add-ons menu in docs
-      .addItem('Start', 'connectToMeraki')
+      .addItem('Start', 'connectToMeraki') 
       .addItem('Block remaining clients', 'blockUnknownClients')
       .addItem('Approve remaining clients', 'approveUnknownClients')
       .addSeparator()
@@ -26,36 +26,28 @@ function onOpen(e) { //The 'e' there tells the system that this doesn't work in 
 
 function connectToMeraki() {
   try {
-    Logger.log('beginning main');
   var sheet = SpreadsheetApp.getActiveSheet();
   var ui = SpreadsheetApp.getUi();
   var userData = getUserInfo(); //grab the user's data: see discreetFunctions
   var apikey = userData.apikey; //set our api key from above data
   if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;} //check the API key is longer than 20 characters
-
+  
   apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=connectToMeraki', 'noApiKeyNeeded'); //analytics
-
-    if (userData.licenseMaxClients == -1) {
-      ui.alert('Your license is expired.', 'Please get a new license at merakiblocki.com and use that.', ui.ButtonSet.OK);
-      return;
-    } else if (userData.licenseMaxClients == -2) {
-      return; //they've already been told...
-    }
-
+  
   var merakiOrganizationId = userData.organizationId;
   var merakiClientsURL;
-
+  
   var currentClients = apiCall('https://api.meraki.com/api/v0/devices/' + userData.securityApplianceSerial + '/clients?timespan=' + userData.clientTimespan, apikey); //grab all clients connected to security appliance
   var numberOfClients = currentClients.jsonResponse.length;
-
+  
  /* for (var i = 0; i < numberOfClients; i++) {
     merakiClientsURL = userData.clientsURL + '#q=' + encodeURIComponent(currentClients.jsonResponse[i].mac);
     range = sheet.getRange("A" + (i+2) + ":E" + (i+2));
     cell = sheet.setActiveRange(range);
-    cell.setValues([[currentClients.jsonResponse[i].description, currentClients.jsonResponse[i].mac, currentClients.jsonResponse[i].ip, currentClients.jsonResponse[i].usage.recv/1000000 + '/' + currentClients.jsonResponse[i].usage.sent/1000000, merakiClientsURL]]);
+    cell.setValues([[currentClients.jsonResponse[i].description, currentClients.jsonResponse[i].mac, currentClients.jsonResponse[i].ip, currentClients.jsonResponse[i].usage.recv/1000000 + '/' + currentClients.jsonResponse[i].usage.sent/1000000, merakiClientsURL]]); 
   }
   This for loop prints out all client data.*/
-
+  
   sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Results");
   var currentClients = currentClients; //gets the clients that are currently connected.
   sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Approved clients");
@@ -65,16 +57,15 @@ function connectToMeraki() {
   var unknownClients = new Array(); //this is the array that will hold the MAC addresses for clients we haven't approved
   var unknownClientsPrint = []; //this is the array that will be printed to the Results sheet
   var unknownClientsLineNum = new Array(); //this is the array that will hold the line numbers of the clients that aren't approved so we can get more info about each unknown client without another API call
-
+  
   var numberOfUnknownDevices = 0; //assume that there are no unknown devices
-  if (userData.licenseMaxClients != 0) var remainingLicenseClients = userData.licenseMaxClients; //ignore if unlimited license
-
+    
   for(i in currentClients.jsonResponse){
     var row = currentClients.jsonResponse[i].mac; //set the row to a mac address
     var duplicate = false; //assume every row is not a duplicate
-    if (remainingLicenseClients < 1) {var notAllClientsPrinted = true; break;} else {remainingLicenseClients -= 1;}
+    
     for(j in approvedClientsResponse){
-      if(row == approvedClientsResponse[j]){ //if the row matches an entry on the approved clients list.
+      if(approvedClients.indexOf(row) > -1){ //if the row matches an entry on the approved clients list.
         duplicate = true; //mark it as a duplicate
       }
     }
@@ -83,7 +74,7 @@ function connectToMeraki() {
       unknownClientsLineNum.push(i); //add the line number to unknownClientsLineNum
     }
   }
-
+  
   sheet.clear(); //reset the sheet and set the headings
   sheet.getRange('A1:E1').setValues([['Description', 'MAC address', 'LAN IP', 'Data down/up in MB', 'Meraki dashboard URL']]);
   /*sheet.getRange('A1').setValue('Description');
@@ -92,67 +83,25 @@ function connectToMeraki() {
   sheet.getRange('D1').setValue('Data down/up in MB');
   sheet.getRange('E1').setValue('Meraki dashboard URL');*/
   //sheet.getRange(2, 1, unknownClients.length, 2).setValues(newData); //gets a selection. starts on row 2, column 1, with a length of the number of unknown clients, 2 wide
-
+   
   /*for (var i = 0; i < unknownClients.length; i++) {
     merakiClientsURL = userData.clientsURL + '#q=' + encodeURIComponent(unknownClients[i]);
     unknownClientsPrint.push([unknownClients[i],merakiClientsURL]);
 
   }*/
-
-      /*if (userData.licenseValidity) {
-      switch (userData.licenseMaxClients) {
-        case 0:
-          var numberOfUnknownClients = unknownClientsLineNum.length;
-          break;
-        case 1500:
-          if (unknownClientsLineNum.length >= userData.licenseMaxClients) {
-            var numberOfUnknownClients = unknownClientsLineNum.length;
-          } else {
-            var numberOfUnknownClients = userData.licenseMaxClients;
-          }
-          break;
-        case 100000:
-          if (unknownClientsLineNum.length >= userData.licenseMaxClients) {
-            var numberOfUnknownClients = unknownClientsLineNum.length;
-          } else {
-            var numberOfUnknownClients = userData.licenseMaxClients;
-          }
-          break;
-        case -1:
-          ui.alert('Your license is expired.', 'Please get a new license at merakiblocki.com and use that.', ui.ButtonSet.OK);
-          break;
-       default:
-          ui.alert('Internal error', 'Since this is my fault and not yours, here\'s a free pass.', ui.ButtonSet.OK);
-          var numberOfUnknownClients = unknownClientsLineNum.length;
-          break;
-      }
-    //} else {
-      //ui.alert('Your license is invalid.', 'Your email most likely does not match your key. Your email is the email used to purchase the key originally. If you know everything is right, go to support at merakiblocki.com.', ui.ButtonSet.OK);
-      //return;
-    //}
-       */
-
-
+  
   for (var i = 0; i < unknownClientsLineNum.length; i++) {
     merakiClientsURL = userData.clientsURL + '#q=' + encodeURIComponent(unknownClients[i]); //set up the URLs: encode the mac address so it's readable by meraki
-    unknownClientsPrint.push([currentClients.jsonResponse[unknownClientsLineNum[i]].description, currentClients.jsonResponse[unknownClientsLineNum[i]].mac, currentClients.jsonResponse[unknownClientsLineNum[i]].ip, currentClients.jsonResponse[unknownClientsLineNum[i]].usage.recv/1000 + '/' + currentClients.jsonResponse[unknownClientsLineNum[i]].usage.sent/1000, merakiClientsURL]);
+    unknownClientsPrint.push([currentClients.jsonResponse[unknownClientsLineNum[i]].description, currentClients.jsonResponse[unknownClientsLineNum[i]].mac, currentClients.jsonResponse[unknownClientsLineNum[i]].ip, currentClients.jsonResponse[unknownClientsLineNum[i]].usage.recv/1000 + '/' + currentClients.jsonResponse[unknownClientsLineNum[i]].usage.sent/1000, merakiClientsURL]); 
   }
-    if (unknownClientsPrint.length >= 1) { //if there are  unknown clients
-      if (notAllClientsPrinted == true) {
-      unknownClientsPrint.push(['Not all clients were scanned due to an insufficient license.', '', '', '', '']);
-      unknownClientsPrint.push(['Upgrade your license at', '', '=HYPERLINK(\"https://merakiblocki.com/#pricing\",\"merakiblocki.com\")', '', '']);
-      sheet.getRange(2, 1, (unknownClients.length+=2), 5).setValues(unknownClientsPrint); //get a range large enough for our data and paste the data in
-      } else {
-        unknownClientsPrint.push(['All clients scanned. Thank you for playing fair.', '', '', '', '']);
-        sheet.getRange(2, 1, (unknownClients.length+=1), 5).setValues(unknownClientsPrint); //get a range large enough for our data and paste the data in
-      }
+    if (unknownClientsPrint.length >= 1) { //if there are no unknown clients
+      sheet.getRange(2, 1, unknownClients.length, 5).setValues(unknownClientsPrint); //get a range large enough for our data and paste the data in
       sheet.activate()
 	  //print out the unknown clients
     } else { //otherwise,
       sheet.activate();
       ui.alert('Congratulations!', 'You don\'t have any un-approved devices! (if you think you do, you might want to check the \'Client timespan\' setting in the User data sheet. you can also check all of the sheets that make up your approved devices list and check those as well.)', ui.ButtonSet.OK); //congratulate the user that their network is in pristine perfectness
     }
-    Logger.log('main function done');
   } catch(e) {
     var payload = {
        "id":"vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk",
@@ -162,7 +111,7 @@ function connectToMeraki() {
        "message":e.message,
     };
     apiCallPost('https://api.mismatch.io/analytics/error', payload);
-    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message);
+    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message); 
   }
 }
 
@@ -173,22 +122,22 @@ function blockUnknownClients() {
   var cell;
   var range;
   var userData = getUserInfo();
-
+  
   apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=blockUnknownClients', 'noApiKeyNeeded'); //analytics
-
+  
   var apikey = userData.apikey;
   if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;}
-
+  
   sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Results");
   var unknownClients = sheet.getRange('B2:B' + sheet.getLastRow()).getValues(); //grab the mac addresses from the results sheet
   sheet.getRange('F1').setValue('Device policy');
-
+  
   var response = ui.alert('Are you sure you want to block all clients listed on this sheet?', 'You can press no below to remove clients you don\'t want to block.' , ui.ButtonSet.YES_NO);
-  if (response != ui.Button.YES) {
+  if (response != ui.Button.YES) { 
     ui.alert('Cancelling.');
     return;
   }
-
+  
   for (i = 0; i < unknownClients.length; i++) {
   //var unknownClientURI = encodeURIComponent(unknownClients[i]); //would encode the mac address but works ok as is
   var response = apiCallPut('https://n126.meraki.com/api/v0/networks/' + userData.networkId + '/clients/' + unknownClients[i] + '/policy?timespan=2592000&devicePolicy=blocked', apikey); //call the api to block the client
@@ -197,7 +146,7 @@ function blockUnknownClients() {
   cell.setValue([['Blocked']]); //put data in the cell
   Utilities.sleep(400); //wait 400 milliseconds to comply with meraki's 5 calls/second limit
   }
-
+    
   } catch(e) {
     var payload = {
        "id":"vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk",
@@ -207,7 +156,7 @@ function blockUnknownClients() {
        "message":e.message,
     };
     apiCallPost('https://api.mismatch.io/analytics/error', payload);
-    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message);
+    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message); 
   }
 }
 
@@ -218,17 +167,17 @@ function approveUnknownClients() {
   var userData = getUserInfo();
   try {
   apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=approveUnknownClients', 'noApiKeyNeeded'); //analytics
-
+  
   sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Results").activate(); //visually switch sheets to Results
   var unknownClients = sheet.getRange('B2:B' + sheet.getLastRow()).getValues(); //grab the mac addresses
-
+  
   var response = ui.alert('Are you sure you want to approve all clients listed on this sheet?', 'This will add all MAC addresses on this sheet to your approved devices list.' , ui.ButtonSet.YES_NO);
   if (response != ui.Button.YES) {
     ui.alert('Cancelling.');
     return;
-
+    
   }
-
+   
   var sheetUrl = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('A2').getValues(); //grab sheet to write to
   var sheetName = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('B2').getValues();
   //var sheetCell = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('C2').getValues();
@@ -240,7 +189,7 @@ function approveUnknownClients() {
   var cell = sheet.activate(); //activate it
   cell.setValue([['Added to allowed list.']]); //write to it
   }
-
+  
   sheet = writingSheet;
   var data = sheet.getDataRange().getValues();
   var newData = new Array();
@@ -258,7 +207,7 @@ function approveUnknownClients() {
   }
   sheet.clearContents();
   sheet.getRange(1, 1, newData.length, newData[0].length).setValues(newData); //above code (whole paragraph) finds and removes duplicates in the approved clients list
-
+  
   } catch(e) {
     var payload = {
        "id":"vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk",
@@ -268,6 +217,6 @@ function approveUnknownClients() {
        "message":e.message,
     };
     apiCallPost('https://api.mismatch.io/analytics/error', payload);
-    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message);
+    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message); 
   }
 }
