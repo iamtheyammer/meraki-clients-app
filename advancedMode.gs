@@ -9,6 +9,7 @@ function printOrganizations() {
   apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=printOrganizations', 'noApiKeyNeeded'); //analytics
  
   var userData = getUserInfo();
+  if (userData == 'OK' || userData == 'CLOSE') return;
   
   var apikey = userData.apikey;
   if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;} //get (^) and verify api key
@@ -54,6 +55,7 @@ function printNetworks() {
   apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=printNetworks', 'noApiKeyNeeded'); //analytics
   
   var userData = getUserInfo();
+  if (userData == 'OK' || userData == 'CLOSE') return;
   
   var apikey = userData.apikey;
   if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;} //get (^) and verify api key
@@ -96,6 +98,7 @@ function customAPICall() {
   apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=customAPICall', 'noApiKeyNeeded'); //analytics
   
   var userData = getUserInfo();
+  if (userData == 'OK' || userData == 'CLOSE') return;
   var apikey = userData.apikey;
   if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;} //get (^) and verify api key
   
@@ -125,6 +128,7 @@ function customAPICallPut() {
   apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=customAPICallPut', 'noApiKeyNeeded'); //analytics
   
   var userData = getUserInfo();
+  if (userData == 'OK' || userData == 'CLOSE') return;
   var apikey = userData.apikey;
   if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;} //get (^) and verify api key
   
@@ -157,6 +161,7 @@ function unblockClients() {
   apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=unblockClients', 'noApiKeyNeeded'); //analytics
   
   var userData = getUserInfo();
+  if (userData == 'OK' || userData == 'CLOSE') return;
   var apikey = userData.apikey;
   if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;} //get (^) and verify api key
   
@@ -165,7 +170,6 @@ function unblockClients() {
   
   var response = ui.alert('Are you sure you want to unblock all clients listed on this sheet?', 'You can press no below to remove clients you don\'t want to unblock.' , ui.ButtonSet.YES_NO);
   if (response != ui.Button.YES) {
-    ui.alert('Cancelling.');
     return;
   }
   

@@ -1,7 +1,6 @@
 //12:17AM, 2/10/18
 function onInstall(e) {
- onOpen(e); 
- initializeSpreadsheet();
+ onOpen(e);
 }
 
 function onOpen(e) { //The 'e' there tells the system that this doesn't work in certain authentication modes. Something to look into, but not a priority.
@@ -29,6 +28,7 @@ function connectToMeraki() {
   var sheet = SpreadsheetApp.getActiveSheet();
   var ui = SpreadsheetApp.getUi();
   var userData = getUserInfo(); //grab the user's data: see discreetFunctions
+  if (userData == 'OK' || userData == 'CLOSE') return;
   var apikey = userData.apikey; //set our api key from above data
   if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;} //check the API key is longer than 20 characters
   
@@ -122,6 +122,7 @@ function blockUnknownClients() {
   var cell;
   var range;
   var userData = getUserInfo();
+  if (userData == 'OK' || userData == 'CLOSE') return;
   
   apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=blockUnknownClients', 'noApiKeyNeeded'); //analytics
   
@@ -134,7 +135,6 @@ function blockUnknownClients() {
   
   var response = ui.alert('Are you sure you want to block all clients listed on this sheet?', 'You can press no below to remove clients you don\'t want to block.' , ui.ButtonSet.YES_NO);
   if (response != ui.Button.YES) { 
-    ui.alert('Cancelling.');
     return;
   }
   
@@ -165,6 +165,7 @@ function approveUnknownClients() {
   var ui = SpreadsheetApp.getUi();
 
   var userData = getUserInfo();
+  if (userData == 'OK' || userData == 'CLOSE') return;
   try {
   apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=approveUnknownClients', 'noApiKeyNeeded'); //analytics
   
@@ -173,9 +174,7 @@ function approveUnknownClients() {
   
   var response = ui.alert('Are you sure you want to approve all clients listed on this sheet?', 'This will add all MAC addresses on this sheet to your approved devices list.' , ui.ButtonSet.YES_NO);
   if (response != ui.Button.YES) {
-    ui.alert('Cancelling.');
     return;
-    
   }
    
   var sheetUrl = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('A2').getValues(); //grab sheet to write to
