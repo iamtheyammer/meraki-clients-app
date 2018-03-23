@@ -1,4 +1,4 @@
-//12:01AM, 2/17/18
+//7:10PM, 3/22/18
 function printOrganizations() {
   try {
   var sheet = SpreadsheetApp.getActiveSheet();
@@ -17,6 +17,7 @@ function printOrganizations() {
   sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Advanced output").activate(); //visually switch to advanced output
   sheet.clear();
   var userOrganizations = apiCall('https://api.meraki.com/api/v0/organizations/', apikey); //make api call
+  if (response == 'OK' || response == 'CLOSE') return;
 
   range = sheet.getRange("A1:B1"); //print heading
   cell = sheet.setActiveRange(range);
@@ -67,6 +68,7 @@ function printNetworks() {
   sheet.clear();
 
   var networkList = apiCall('https://api.meraki.com/api/v0/organizations/' + organizationId + '/networks', apikey); //make api call
+  if (response == 'OK' || response == 'CLOSE') return;
   var numberOfNetworks = networkList.jsonResponse.length;
 
   range = sheet.getRange("A1:B1"); //print heading
@@ -193,6 +195,7 @@ function unblockClients() {
   Logger.log('Attempting to block ' + unknownClients[i] + 'from the network...');
   //var unknownClientURI = encodeURIComponent(unknownClients[i]); //encodes mac address but not used, works as is
   var response = apiCallPut('https://n126.meraki.com/api/v0/networks/' + userData.networkId + '/clients/' + unknownClients[i] + '/policy?timespan=2592000&devicePolicy=normal', apikey); //make api call
+  if (response == 'OK' || response == 'CLOSE') return;
   range = sheet.getRange("F" + (i+2) + ":F" + (i+2)); //print that it's done
   cell = sheet.setActiveRange(range);
   cell.setValue([['Device policy set to Normal']]);

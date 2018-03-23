@@ -1,4 +1,4 @@
-//9:43AM, 2/17/18
+//7:10PM, 3/22/18
 function onInstall(e) {
  onOpen(e);
  initializeSpreadsheet();
@@ -30,7 +30,7 @@ function connectToMeraki() {
   var sheet = SpreadsheetApp.getActiveSheet();
   var ui = SpreadsheetApp.getUi();
   var userData = getUserInfo(); //grab the user's data: see discreetFunctions
-  if (userData == 'OK' || userData == 'CLOSE') return; 
+  if (userData == 'OK' || userData == 'CLOSE') return;
   var apikey = userData.apikey; //set our api key from above data
   if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;} //check the API key is longer than 20 characters
 
@@ -47,6 +47,7 @@ function connectToMeraki() {
   var merakiClientsURL;
 
   var currentClients = apiCall('https://api.meraki.com/api/v0/devices/' + userData.securityApplianceSerial + '/clients?timespan=' + userData.clientTimespan, apikey); //grab all clients connected to security appliance
+  if (currentClients == 'OK' || currentClients == 'CLOSE') return;
   var numberOfClients = currentClients.jsonResponse.length;
 
  /* for (var i = 0; i < numberOfClients; i++) {
@@ -194,6 +195,7 @@ function blockUnknownClients() {
   for (i = 0; i < unknownClients.length; i++) {
   //var unknownClientURI = encodeURIComponent(unknownClients[i]); //would encode the mac address but works ok as is
   var response = apiCallPut('https://n126.meraki.com/api/v0/networks/' + userData.networkId + '/clients/' + unknownClients[i] + '/policy?timespan=2592000&devicePolicy=blocked', apikey); //call the api to block the client
+  if (response == 'OK' || response == 'CLOSE') return;
   range = sheet.getRange("F" + (i+2) + ":F" + (i+2)); //get the cell to print to
   cell = sheet.setActiveRange(range); //set the cell as active
   cell.setValue([['Blocked']]); //put data in the cell
@@ -227,9 +229,7 @@ function approveUnknownClients() {
 
   var response = ui.alert('Are you sure you want to approve all clients listed on this sheet?', 'This will add all MAC addresses on this sheet to your approved devices list.' , ui.ButtonSet.YES_NO);
   if (response != ui.Button.YES) {
-    ui.alert('Cancelling.');
     return;
-
   }
 
   var sheetUrl = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('A2').getValues(); //grab sheet to write to

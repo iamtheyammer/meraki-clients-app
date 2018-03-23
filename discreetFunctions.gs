@@ -1,23 +1,30 @@
-//9:43AM, 2/17/18
+//7:10PM, 3/22/18
 /* This is the discreetFunctions code sheet. It's for functions that take in and put out data, like small processors. It's not for the main code flow. */
 
 function apiCall(url, apikey) {
   Logger.log('Attempting an API call to ' + url + '.');
   var APIheaders = {'X-Cisco-Meraki-API-Key': apikey}; //sets headers
-  var options = {'contentType':'application/json', 'method':'GET', 'headers':APIheaders};
+  var options = {'contentType':'application/json', 'method':'GET', 'headers':APIheaders, 'muteHttpExceptions':true};
   var response = UrlFetchApp.fetch(url, options); //actual api call
+  if (response.getResponseCode() != 200) {
+    return SpreadsheetApp.getUi().alert('Something wasn\'t right.', 'I tried to contact Meraki, but I got a ' + response.getResponseCode() + ' response code. If you got a 404, either your security appliance serial number, API key, organization ID or network ID isn\'t correct.', SpreadsheetApp.getUi().ButtonSet.OK);
+  }
   Logger.log('API call succeeded. Parsing responses.');
   var stringResponse = response.getContentText();
   var jsonResponse = JSON.parse(stringResponse); //parses response as json
   Logger.log('Completed API call to ' + url + '.');
   return {'jsonResponse':jsonResponse, 'stringResponse':stringResponse};
+  
 }
 
 function apiCallPut(url, apikey) {
   Logger.log('Attempting an API call to ' + url + '.');
   var APIheaders = {'X-Cisco-Meraki-API-Key': apikey}; //sets headers
-  var options = {'contentType':'application/json', 'method':'put', 'headers':APIheaders};
+  var options = {'contentType':'application/json', 'method':'put', 'headers':APIheaders, 'muteHttpExceptions':true};
   var response = UrlFetchApp.fetch(url, options); //actual api call
+  if (response.getResponseCode() != 200) {
+    return SpreadsheetApp.getUi().alert('Something wasn\'t right.', 'I tried to contact Meraki, but I got a ' + response.getResponseCode() + ' response code. If you got a 404, either your security appliance serial number, API key, organization ID or network ID isn\'t correct.', SpreadsheetApp.getUi().ButtonSet.OK);
+  }
   Logger.log('API call succeeded. Parsing responses.');
   var stringResponse = response.getContentText();
   var jsonResponse = JSON.parse(stringResponse); //parses response as json
@@ -30,6 +37,9 @@ function apiCallPost(url, payload) {
   Logger.log('Attempting an API call to ' + url + '.');
   var options = {'contentType':'application/json', 'method':'post', 'payload':JSON.stringify(payload), 'muteHttpExceptions':true};
   var response = UrlFetchApp.fetch(url, options); //actual api call
+  if (response.getResponseCode() != 200) {
+    return SpreadsheetApp.getUi().alert('Something wasn\'t right.', 'I tried to contact Meraki, but I got a ' + response.getResponseCode() + ' response code. If you got a 404, either your security appliance serial number, API key, organization ID or network ID isn\'t correct.', SpreadsheetApp.getUi().ButtonSet.OK);
+  }
   Logger.log('API call succeeded. Parsing responses.');
   var stringResponse = response.getContentText();
   Logger.log(stringResponse);
@@ -92,24 +102,24 @@ function getUserInfo() {
   if (!clientsURL) return ui.alert('Your Meraki Dashboard link is missing.', 'Please check your User data sheet. If there\'s no User data sheet, try initializing your sheet from Add-ons, MerakiBlocki, Advanced, Initialize spreadsheet', ui.ButtonSet.OK);
 
   var range = sheet.getRange('G2'); //grabs user license Key
+    Logger.log('log1');
   var licenseKey = range.getDisplayValue();
+    Logger.log('log2');
   if (!licenseKey) return ui.alert('Your license key is missing.', 'Please check your User data sheet. If there\'s no User data sheet, try initializing your sheet from Add-ons, MerakiBlocki, Advanced, Initialize spreadsheet', ui.ButtonSet.OK);
   
   var range = sheet.getRange('H2'); //grabs user license email
   var licenseEmail = range.getDisplayValue();
-  if (!clientsURL) return ui.alert('Your license email is missing.', 'Please check your User data sheet. If there\'s no User data sheet, try initializing your sheet from Add-ons, MerakiBlocki, Advanced, Initialize spreadsheet', ui.ButtonSet.OK);
+  if (!licenseEmail) return ui.alert('Your license email is missing.', 'Please check your User data sheet. If there\'s no User data sheet, try initializing your sheet from Add-ons, MerakiBlocki, Advanced, Initialize spreadsheet', ui.ButtonSet.OK);
   
   var verificationResponse = apiCall('https://api.mismatch.io/licensing/verify?licenseKey=' + licenseKey + '&app=merakiApp&email=' + licenseEmail, 'noAPIKeyNeeded').jsonResponse;
   var response = verificationResponse[0];
-  var returning = {'apikey':apikey,'organizationId':organizationId,'networkId':networkId,'securityApplianceSerial':securityApplianceSerial,'clientTimespan':clientTimespan,'clientsURL':clientsURL,'licenseValidity':licenseValidity,'licenseMaxClients':licenseMaxClients,'licenseType':response.licenseType};
   if (!response) {
       Logger.log(verificationResponse.licenseType);
       Logger.log(verificationResponse.email);
       var licenseValidity = false;
       var licenseMaxClients = -2;
       SpreadsheetApp.getActiveSpreadsheet().getSheetByName('User data').getRange("G3").setValue('Invalid license.');
-      ui.alert('Invalid license.', verificationResponse.message, ui.ButtonSet.OK);
-      return returning;
+      return ui.alert('Invalid license.', verificationResponse.message, ui.ButtonSet.OK);
   } else {
     if (response.licenseType == 'basic' && response.email == licenseEmail) {
       var licenseValidity = true;
@@ -132,16 +142,16 @@ function getUserInfo() {
       SpreadsheetApp.getActiveSpreadsheet().getSheetByName('User data').getRange("G3").setValue('Expired license.');
       Logger.log('EXPIRED LICENSE');
     } else {
-      Logger.log(response.licenseType);
-      Logger.log(response.email);
+      //Logger.log(response.licenseType);
+      //Logger.log(response.email);
       var licenseValidity = false;
       var licenseMaxClients = -2;
       SpreadsheetApp.getActiveSpreadsheet().getSheetByName('User data').getRange("G3").setValue('Invalid license.');
-      ui.alert('Something\'s wrong with your license.', 'It wasn\'t specifically expired, so it\'s very possible that your license and email don\'t match. Or it\'s possible your key doesn\'t exist. Check them and try again.', ui.ButtonSet.OK)
+      ui.alert('Something\'s wrong with your license.', 'It wasn\'t specifically expired, so it\'s very possible that your license and email don\'t match. Or it\'s possible your key doesn\'t exist. Check them and try again.', ui.ButtonSet.OK);
     }
   }
     Logger.log('end get user info');
-    return returning;
+    return {'apikey':apikey,'organizationId':organizationId,'networkId':networkId,'securityApplianceSerial':securityApplianceSerial,'clientTimespan':clientTimespan,'clientsURL':clientsURL,'licenseValidity':licenseValidity,'licenseMaxClients':licenseMaxClients,'licenseType':response.licenseType};
   } catch(e) {
     var payload = {
        "id":"vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk",
@@ -155,7 +165,7 @@ function getUserInfo() {
   }
 }
 /* Using the getUserInfo function:
-Grabs the user's API key, organization ID and network ID. Doesn't require any variables. */
+Grabs user data from User info sheet. Doesn't require any memberwise inits. */
 
 
 function verifyInfoWithUser(dataToVerify, errorIfNotVerified) {
