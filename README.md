@@ -3,7 +3,7 @@ Simple app to pull all of your meraki clients and compare them against a list of
 
 ## Install
 
-The full add-on is available [here](https://chrome.google.com/webstore/detail/merakiblocki/gfahbfffpkbhomhgmnnlbbonfkgdjmdf). Just add it onto google sheets.
+The full add-on is available [here](https://chrome.google.com/webstore/detail/merakiblocki/gfahbfffpkbhomhgmnnlbbonfkgdjmdf). Just add it onto google sheets. Or, you can make a new spreadsheet of your choice, go to Add-ons, Get add-ons... and search for MerakiBlocki.
 
 When you install the app, it should ask if you want to initialize your spreadsheet. If it doesn't, just go to Add-ons -> MerakiBlocki -> Advanced -> Initialize spreadsheet
 
