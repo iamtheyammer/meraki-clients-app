@@ -30,6 +30,7 @@ function connectToMeraki() {
   var sheet = SpreadsheetApp.getActiveSheet();
   var ui = SpreadsheetApp.getUi();
   var userData = getUserInfo(); //grab the user's data: see discreetFunctions
+  if (userData == 'OK' || userData == 'CLOSE') return; 
   var apikey = userData.apikey; //set our api key from above data
   if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;} //check the API key is longer than 20 characters
 
@@ -173,6 +174,7 @@ function blockUnknownClients() {
   var cell;
   var range;
   var userData = getUserInfo();
+  if (userData == 'OK' || userData == 'CLOSE') return;
 
   apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=blockUnknownClients', 'noApiKeyNeeded'); //analytics
 
@@ -216,6 +218,7 @@ function approveUnknownClients() {
   var ui = SpreadsheetApp.getUi();
 
   var userData = getUserInfo();
+  if (userData == 'OK' || userData == 'CLOSE') return;
   try {
   apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=approveUnknownClients', 'noApiKeyNeeded'); //analytics
 

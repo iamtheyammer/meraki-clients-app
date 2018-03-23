@@ -9,6 +9,7 @@ function printOrganizations() {
   apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=printOrganizations', 'noApiKeyNeeded'); //analytics
 
   var userData = getUserInfo();
+  if (userData == 'OK' || userData == 'CLOSE') return;
 
   var apikey = userData.apikey;
   if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;} //get (^) and verify api key
@@ -54,6 +55,7 @@ function printNetworks() {
   apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=printNetworks', 'noApiKeyNeeded'); //analytics
 
   var userData = getUserInfo();
+  if (userData == 'OK' || userData == 'CLOSE') return;
 
   var apikey = userData.apikey;
   if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;} //get (^) and verify api key
@@ -94,6 +96,7 @@ function customAPICall() {
   var ui = SpreadsheetApp.getUi();
 
   var userData = getUserInfo();
+  if (userData == 'OK' || userData == 'CLOSE') return;
   var apikey = userData.apikey;
   if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;} //get (^) and verify api key
 
@@ -130,6 +133,7 @@ function customAPICallPut() {
   var ui = SpreadsheetApp.getUi();
 
   var userData = getUserInfo();
+  if (userData == 'OK' || userData == 'CLOSE') return;
   var apikey = userData.apikey;
   if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;} //get (^) and verify api key
 
@@ -170,6 +174,7 @@ function unblockClients() {
   apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=unblockClients', 'noApiKeyNeeded'); //analytics
 
   var userData = getUserInfo();
+  if (userData == 'OK' || userData == 'CLOSE') return;
   var apikey = userData.apikey;
   if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;} //get (^) and verify api key
 
