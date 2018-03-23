@@ -7,7 +7,7 @@ The full add-on is available [here](https://chrome.google.com/webstore/detail/me
 
 When you install the app, it should ask if you want to initialize your spreadsheet. If it doesn't, just go to Add-ons -> MerakiBlocki -> Advanced -> Initialize spreadsheet
 
-Eventually, you'll be able to go [here](https://mismatch.io/index.php/merakiapp) to get more information, but it's not ready yet.
+Go to our website, [https://merakiblocki.com](https://merakiblocki.com), for more information or to buy a license.
 
 ## Help/Support/Questions
 
