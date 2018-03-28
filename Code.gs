@@ -1,4 +1,4 @@
-//7:10PM, 3/22/18
+//7:48PM, 3/27/18
 function onInstall(e) {
  onOpen(e);
  initializeSpreadsheet();
@@ -21,6 +21,8 @@ function onOpen(e) { //The 'e' there tells the system that this doesn't work in 
                   .addSubMenu(ui.createMenu('Custom API call')
                               .addItem('Custom GET request', 'customAPICall')
                               .addItem('Custom PUT request', 'customAPICallPut')))
+      .addSeparator()
+      .addItem('Make a wish', 'makeAWish')
       .addToUi(); //Completes the add call.
 }
 
@@ -273,4 +275,8 @@ function approveUnknownClients() {
     apiCallPost('https://api.mismatch.io/analytics/error', payload);
     SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message);
   }
+}
+
+function makeAWish() {
+  SpreadsheetApp.getUi().alert('Make a wish', 'Help us help you! Click below to make your wish and we\'ll get back to you within 72 hours:\n http://jira.mismatch.io/servicedesk/customer/portal/1 \n (you may have to copy and paste the URL into your address bar)', SpreadsheetApp.getUi().ButtonSet.OK)
 }
