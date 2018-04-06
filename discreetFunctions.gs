@@ -1,4 +1,4 @@
-//7:10PM, 3/22/18
+//11:09PM, 4/5/18
 /* This is the discreetFunctions code sheet. It's for functions that take in and put out data, like small processors. It's not for the main code flow. */
 
 function apiCall(url, apikey) {
@@ -257,10 +257,12 @@ function getApprovedClients() {
   var approvedTest = [];
 
   for (var i = 0; i < indexingSheetUrls.length; i++) {
+    Logger.log("getting approved clients: " + i);
 	var spreadSheet = SpreadsheetApp.openByUrl(indexingSheetUrls[i].join()); //open the i-st spreadsheet
     var sheet = spreadSheet.getSheetByName(indexingSheetNames[i].join()); //open the sheet inside of aforementioned spreadsheet
-    approvedClients.push(sheet.getRange(indexingSheetFirstCells[i].join() + ':' + indexingSheetFirstCells[i].join().slice(0,1) + spreadSheet.getSheetByName(indexingSheetNames[i]).getLastRow()).getValues()); //add all of the mac addresses on that sheet to the approved clients variable
+    approvedClients = approvedClients.concat(sheet.getRange(indexingSheetFirstCells[i].join() + ':' + indexingSheetFirstCells[i].join().slice(0,1) + spreadSheet.getSheetByName(indexingSheetNames[i]).getLastRow()).getValues()); //add all of the mac addresses on that sheet to the approved clients variable
   }
+      Logger.log(approvedClients);
       Logger.log('approved clients scan done.');
   return approvedClients; //retunr our final product
 } catch(e) { //I feel like this script might have a high chance for error, so I better add proper error reporting.
