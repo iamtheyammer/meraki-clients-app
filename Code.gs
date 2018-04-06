@@ -1,4 +1,4 @@
-//11:22PM, 4/5/18
+//11:44PM, 4/5/18
 function onInstall(e) {
  onOpen(e);
  initializeSpreadsheet();
@@ -92,7 +92,7 @@ function connectToMeraki() {
       unknownClientsLineNum.push(i); //add the line number to unknownClientsLineNum
     }
   }
-
+  logAndUpdateCell('Getting ready to display data...', 'A1', 'Results');
   sheet.clear(); //reset the sheet and set the headings
   sheet.getRange('A1:E1').setValues([['Description', 'MAC address', 'LAN IP', 'Data down/up in MB', 'Meraki dashboard URL']]);
   /*sheet.getRange('A1').setValue('Description');
@@ -140,8 +140,6 @@ function connectToMeraki() {
       //return;
     //}
        */
-
-  logAndUpdateCell('Getting ready to display data...', 'A1', 'Results');
   for (var i = 0; i < unknownClientsLineNum.length; i++) {
     merakiClientsURL = userData.clientsURL + '#q=' + encodeURIComponent(unknownClients[i]); //set up the URLs: encode the mac address so it's readable by meraki
     unknownClientsPrint.push([currentClients.jsonResponse[unknownClientsLineNum[i]].description, currentClients.jsonResponse[unknownClientsLineNum[i]].mac, currentClients.jsonResponse[unknownClientsLineNum[i]].ip, currentClients.jsonResponse[unknownClientsLineNum[i]].usage.recv/1000 + '/' + currentClients.jsonResponse[unknownClientsLineNum[i]].usage.sent/1000, merakiClientsURL]);
