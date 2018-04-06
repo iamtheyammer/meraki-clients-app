@@ -1,4 +1,4 @@
-//7:48PM, 3/27/18
+//11:22PM, 4/5/18
 function onInstall(e) {
  onOpen(e);
  initializeSpreadsheet();
@@ -31,13 +31,13 @@ function connectToMeraki() {
     Logger.log('beginning main');
   var sheet = SpreadsheetApp.getActiveSheet();
   var ui = SpreadsheetApp.getUi();
+  sheet.clear();
+  logAndUpdateCell('Getting data from User data sheet and checking license...', 'A1', 'Results');
   var userData = getUserInfo(); //grab the user's data: see discreetFunctions
   if (userData == 'OK' || userData == 'CLOSE') return;
   var apikey = userData.apikey; //set our api key from above data
   if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;} //check the API key is longer than 20 characters
-
-  apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=connectToMeraki', 'noApiKeyNeeded'); //analytics
-
+   
     if (userData.licenseMaxClients == -1) {
       ui.alert('Your license is expired.', 'Please get a new license at merakiblocki.com and use that.', ui.ButtonSet.OK);
       return;
@@ -45,9 +45,12 @@ function connectToMeraki() {
       return; //they've already been told...
     }
 
+  logAndUpdateCell('Reporting analytics...', 'A1', 'Results');
+  apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=connectToMeraki', 'noApiKeyNeeded'); //analytics
+  
   var merakiOrganizationId = userData.organizationId;
   var merakiClientsURL;
-
+  logAndUpdateCell('Getting clients from Meraki...', 'A1', 'Results');
   var currentClients = apiCall('https://api.meraki.com/api/v0/devices/' + userData.securityApplianceSerial + '/clients?timespan=' + userData.clientTimespan, apikey); //grab all clients connected to security appliance
   if (currentClients == 'OK' || currentClients == 'CLOSE') return;
   var numberOfClients = currentClients.jsonResponse.length;
@@ -63,6 +66,7 @@ function connectToMeraki() {
   sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Results");
   var currentClients = currentClients; //gets the clients that are currently connected.
   sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Approved clients");
+  logAndUpdateCell('Getting approved clients...', 'A1', 'Results');
   var approvedClientsResponse = getApprovedClients();
   var approvedClients = JSON.stringify(approvedClientsResponse);
   sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Results");
@@ -72,7 +76,8 @@ function connectToMeraki() {
 
   var numberOfUnknownDevices = 0; //assume that there are no unknown devices
   if (userData.licenseMaxClients != 0) var remainingLicenseClients = userData.licenseMaxClients; //ignore if unlimited license
-
+  
+  logAndUpdateCell('Checking for unapproved clients...', 'A1', 'Results');
   for(i in currentClients.jsonResponse){
     var row = currentClients.jsonResponse[i].mac; //set the row to a mac address
     var duplicate = false; //assume every row is not a duplicate
@@ -136,7 +141,7 @@ function connectToMeraki() {
     //}
        */
 
-
+  logAndUpdateCell('Getting ready to display data...', 'A1', 'Results');
   for (var i = 0; i < unknownClientsLineNum.length; i++) {
     merakiClientsURL = userData.clientsURL + '#q=' + encodeURIComponent(unknownClients[i]); //set up the URLs: encode the mac address so it's readable by meraki
     unknownClientsPrint.push([currentClients.jsonResponse[unknownClientsLineNum[i]].description, currentClients.jsonResponse[unknownClientsLineNum[i]].mac, currentClients.jsonResponse[unknownClientsLineNum[i]].ip, currentClients.jsonResponse[unknownClientsLineNum[i]].usage.recv/1000 + '/' + currentClients.jsonResponse[unknownClientsLineNum[i]].usage.sent/1000, merakiClientsURL]);

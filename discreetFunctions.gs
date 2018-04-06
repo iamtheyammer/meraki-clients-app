@@ -1,4 +1,4 @@
-//11:09PM, 4/5/18
+//11:22PM, 4/5/18
 /* This is the discreetFunctions code sheet. It's for functions that take in and put out data, like small processors. It's not for the main code flow. */
 
 function apiCall(url, apikey) {
@@ -308,4 +308,8 @@ function initializeSpreadsheet() {
   initSheet.getSheetByName('User data').getRange('A2:F2').setBackground('yellow');
   initSheet.insertSheet('Advanced output').getRange(readingSpreadSheet.getSheetByName('Advanced output').getDataRange().getA1Notation()).setValues(readingSpreadSheet.getSheetByName('Advanced output').getDataRange().getValues());
   initSheet.getSheetByName('Results').activate();
+}
+
+function logAndUpdateCell(message, cell, sheetName) {
+ SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName).getRange(cell).setValue(message);
 }
