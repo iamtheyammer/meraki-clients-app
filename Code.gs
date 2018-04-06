@@ -1,4 +1,4 @@
-//11:44PM, 4/5/18
+//7:14AM, 4/6/18
 function onInstall(e) {
  onOpen(e);
  initializeSpreadsheet();
@@ -31,6 +31,10 @@ function connectToMeraki() {
     Logger.log('beginning main');
   var sheet = SpreadsheetApp.getActiveSheet();
   var ui = SpreadsheetApp.getUi();
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Results').activate();
+    if (SpreadsheetApp.getActiveSheet().getSheetName() != 'Results') {
+      ui.alert('I can\'t find your Results sheet. Did you rename it?'); 
+    }
   sheet.clear();
   logAndUpdateCell('Getting data from User data sheet and checking license...', 'A1', 'Results');
   var userData = getUserInfo(); //grab the user's data: see discreetFunctions
@@ -155,6 +159,9 @@ function connectToMeraki() {
       }
       sheet.activate()
 	  //print out the unknown clients
+    } else if (unknownClientsPrint.length < 1 && currentClients.length >= userData.licenseMaxClients) {
+      sheet.getRange(2, 1, 1, 1).setValue('Not all clients were scanned due to an insufficient license.');
+      sheet.getRange(3, 1, 1, 3).setValues([['Upgrade your license at', '', '=HYPERLINK(\"https://merakiblocki.com/#pricing\",\"merakiblocki.com\")']]);
     } else { //otherwise,
       sheet.activate();
       ui.alert('Congratulations!', 'You don\'t have any un-approved devices! (if you think you do, you might want to check the \'Client timespan\' setting in the User data sheet. you can also check all of the sheets that make up your approved devices list and check those as well.)', ui.ButtonSet.OK); //congratulate the user that their network is in pristine perfectness
