@@ -1,4 +1,4 @@
-//7:10PM, 3/22/18
+//6:19PM, 4/6/18
 function printOrganizations() {
   try {
   var sheet = SpreadsheetApp.getActiveSheet();
@@ -17,7 +17,7 @@ function printOrganizations() {
   sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Advanced output").activate(); //visually switch to advanced output
   sheet.clear();
   var userOrganizations = apiCall('https://api.meraki.com/api/v0/organizations/', apikey); //make api call
-  if (response == 'OK' || response == 'CLOSE') return;
+  if (userOrganizations == 'OK' || userOrganizations == 'CLOSE') return;
 
   range = sheet.getRange("A1:B1"); //print heading
   cell = sheet.setActiveRange(range);
@@ -68,7 +68,7 @@ function printNetworks() {
   sheet.clear();
 
   var networkList = apiCall('https://api.meraki.com/api/v0/organizations/' + organizationId + '/networks', apikey); //make api call
-  if (response == 'OK' || response == 'CLOSE') return;
+  if (networkList == 'OK' || networkList == 'CLOSE') return;
   var numberOfNetworks = networkList.jsonResponse.length;
 
   range = sheet.getRange("A1:B1"); //print heading
