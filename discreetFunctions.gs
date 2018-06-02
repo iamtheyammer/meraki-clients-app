@@ -1,4 +1,4 @@
-//10:30AM, 6/2/18
+//3:20PM, 6/2/18
 /* This is the discreetFunctions code sheet. It's for functions that take in and put out data, like small processors. It's not for the main code flow. */
 
 function apiCall(url, apikey) {
@@ -287,10 +287,11 @@ function getApprovedClients() {
   
   for (var i = 0; i < indexingSheetUrls.length; i++) {
     Logger.log("getting approved clients: " + i);
-	var spreadSheet = SpreadsheetApp.openByUrl(indexingSheetUrls[0].join()); //open the i-st spreadsheet
+	var spreadSheet = SpreadsheetApp.openByUrl(indexingSheetUrls[i].join()); //open the i-st spreadsheet
     Logger.log("1");
     var sheet = spreadSheet.getSheetByName(indexingSheetNames[i].join()); //open the sheet inside of aforementioned spreadsheet
     Logger.log("2");
+    //var string = indexingSheetFirstCells[i].join() + ':' + indexingSheetFirstCells[i].join().slice(0,1) + spreadSheet.getSheetByName(indexingSheetNames[i]).getLastRow();
     approvedClients = approvedClients.concat(sheet.getRange(indexingSheetFirstCells[i].join() + ':' + indexingSheetFirstCells[i].join().slice(0,1) + spreadSheet.getSheetByName(indexingSheetNames[i]).getLastRow()).getValues()); //add all of the mac addresses on that sheet to the approved clients variable
     Logger.log("3");
   }
