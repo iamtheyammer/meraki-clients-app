@@ -1,4 +1,4 @@
-//11:22PM, 4/5/18
+//10:30AM, 6/2/18
 /* This is the discreetFunctions code sheet. It's for functions that take in and put out data, like small processors. It's not for the main code flow. */
 
 function apiCall(url, apikey) {
@@ -27,9 +27,9 @@ function apiCallPut(url, apikey) {
   }
   Logger.log('API call succeeded. Parsing responses.');
   var stringResponse = response.getContentText();
+  Logger.log(stringResponse);
   var jsonResponse = JSON.parse(stringResponse); //parses response as json
   Logger.log('Completed API call to ' + url + '.');
-  return;
   return {'jsonResponse':jsonResponse, 'stringResponse':stringResponse};
 } //The only difference between the top and bottom functions is that apiCallPut is a PUT request whereas apiCall is a GET request.
 
@@ -67,15 +67,17 @@ function testAPICall() {
 
 } */
 
-function getUserInfo() {
+function getUserInfo(muteWarnings, sheet) {
   try {
     Logger.log('begin get user info');
   var ui = SpreadsheetApp.getUi();
   //find user organization
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('User data');
+  if (!muteWarnings) var muteWarnings = false; //if it wasn't passed in, default to false
+  if (!sheet) var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('User data'); //if sheet isn't passed in, get it
   if (!sheet) return ui.alert('Can\'t find User data sheet.', 'Please make sure you initialised your sheet. Try going to Add-ons, MerakiBlocki, Advanced, Initialize spreadsheet.', ui.ButtonSet.OK);
-  if (!sheet.getRange('A2')) {
-  	return ui.alert('Your API key is missing.', 'Please check your User data sheet. If there\'s no User data sheet, try initializing your sheet from Add-ons, MerakiBlocki, Advanced, Initialize spreadsheet', ui.ButtonSet.OK);
+    
+  if (!sheet.getRange('A2').getDisplayValue()) {
+  	return ui.alert('Your API key is missing.', 'Please check your User data sheet. If there\'s no User data sheet, try initializing your sheet from Add-ons, MerakiBlocki, Get started, Initialize spreadsheet', ui.ButtonSet.OK);
   } else {
 	 var range = sheet.getRange('A2'); //grabs API Key
 	 var apikey = range.getDisplayValue();
@@ -83,34 +85,46 @@ function getUserInfo() {
 
   var range = sheet.getRange('B2'); //grabs Organization ID
   var organizationId = range.getDisplayValue();
-  if (!organizationId) return ui.alert('Your Organization ID is missing.', 'Please check your User data sheet. If there\'s no User data sheet, try initializing your sheet from Add-ons, MerakiBlocki, Advanced, Initialize spreadsheet', ui.ButtonSet.OK);
+  if (!organizationId && muteWarnings == false) return ui.alert('Your Organization ID is missing.', 'Please check your User data sheet. If there\'s no User data sheet, try initializing your sheet from Add-ons, MerakiBlocki, Get started, Initialize spreadsheet', ui.ButtonSet.OK);
 
   var range = sheet.getRange('C2'); //grabs Network ID
   var networkId = range.getDisplayValue();
-  if (!networkId) return ui.alert('Your Network ID is missing.', 'Please check your User data sheet. If there\'s no User data sheet, try initializing your sheet from Add-ons, MerakiBlocki, Advanced, Initialize spreadsheet', ui.ButtonSet.OK);
+  if (!networkId && muteWarnings == false) return ui.alert('Your Network ID is missing.', 'Please check your User data sheet. If there\'s no User data sheet, try initializing your sheet from Add-ons, MerakiBlocki, Get started, Initialize spreadsheet', ui.ButtonSet.OK);
 
   var range = sheet.getRange('D2'); //grabs security appliance serial
   var securityApplianceSerial = range.getDisplayValue();
-  if (!securityApplianceSerial) return ui.alert('Your Security Appliance serial number is missing.', 'Please check your User data sheet. If there\'s no User data sheet, try initializing your sheet from Add-ons, MerakiBlocki, Advanced, Initialize spreadsheet', ui.ButtonSet.OK);
+  if (!securityApplianceSerial && muteWarnings == false) return ui.alert('Your Security Appliance serial number is missing.', 'Please check your User data sheet. If there\'s no User data sheet, try initializing your sheet from Add-ons, MerakiBlocki, Get started, Initialize spreadsheet', ui.ButtonSet.OK);
 
   var range = sheet.getRange('E2'); //grabs timespan to list clients
   var clientTimespan = range.getDisplayValue();
-  if (!clientTimespan) return ui.alert('Your client timespan is missing.', 'Please check your User data sheet. If there\'s no User data sheet, try initializing your sheet from Add-ons, MerakiBlocki, Advanced, Initialize spreadsheet', ui.ButtonSet.OK);
+  if (!clientTimespan && muteWarnings == false) return ui.alert('Your client timespan is missing.', 'Please check your User data sheet. If there\'s no User data sheet, try initializing your sheet from Add-ons, MerakiBlocki, Get started, Initialize spreadsheet', ui.ButtonSet.OK);
   
   var range = sheet.getRange('F2'); //grabs client dashboard link
   var clientsURL = range.getDisplayValue();
-  if (!clientsURL) return ui.alert('Your Meraki Dashboard link is missing.', 'Please check your User data sheet. If there\'s no User data sheet, try initializing your sheet from Add-ons, MerakiBlocki, Advanced, Initialize spreadsheet', ui.ButtonSet.OK);
+  if (!clientsURL && muteWarnings == false) return ui.alert('Your Meraki Dashboard link is missing.', 'Please check your User data sheet. If there\'s no User data sheet, try initializing your sheet from Add-ons, MerakiBlocki, Get started, Initialize spreadsheet', ui.ButtonSet.OK);
 
   var range = sheet.getRange('G2'); //grabs user license Key
-    Logger.log('log1');
   var licenseKey = range.getDisplayValue();
-    Logger.log('log2');
-  if (!licenseKey) return ui.alert('Your license key is missing.', 'Please check your User data sheet. If there\'s no User data sheet, try initializing your sheet from Add-ons, MerakiBlocki, Advanced, Initialize spreadsheet', ui.ButtonSet.OK);
+  if (!licenseKey && muteWarnings == false) return ui.alert('Your license key is missing.', 'Please check your User data sheet. If there\'s no User data sheet, try initializing your sheet from Add-ons, MerakiBlocki, Get started, Initialize spreadsheet', ui.ButtonSet.OK);
   
   var range = sheet.getRange('H2'); //grabs user license email
   var licenseEmail = range.getDisplayValue();
-  if (!licenseEmail) return ui.alert('Your license email is missing.', 'Please check your User data sheet. If there\'s no User data sheet, try initializing your sheet from Add-ons, MerakiBlocki, Advanced, Initialize spreadsheet', ui.ButtonSet.OK);
+  if (!licenseEmail && muteWarnings == false) return ui.alert('Your license email is missing.', 'Please check your User data sheet. If there\'s no User data sheet, try initializing your sheet from Add-ons, MerakiBlocki, Get started, Initialize spreadsheet', ui.ButtonSet.OK);
   
+  var shard = clientsURL.slice(8, clientsURL.indexOf('.')); //calculates the shard from your clients URL
+    
+  if (!licenseKey || !licenseEmail) {
+    if (muteWarnings == true) {
+      if (!apikey) apikey = 'This value is missing and muteWarnings was set to true.';
+      if (!organizationId) organizationId = 'This value is missing and muteWarnings was set to true.';
+      if (!networkId) networkId = 'This value is missing and muteWarnings was set to true.';
+      if (!securityApplianceSerial) securityApplianceSerial = 'This value is missing and muteWarnings was set to true.';
+      if (!clientTimespan) clientTimespan = 'This value is missing and muteWarnings was set to true.';
+      if (!clientsURL) clientsURL = 'This value is missing and muteWarnings was set to true.';
+      return {'apikey':apikey,'organizationId':organizationId,'networkId':networkId,'securityApplianceSerial':securityApplianceSerial,'clientTimespan':clientTimespan,'clientsURL':clientsURL,'licenseValidity':'muteWarnings was true and license info was missing.','licenseMaxClients':'muteWarnings was true and license info was missing','licenseType':'muteWarnings was true and license info was missing','shard':shard};
+    }
+  }
+    
   var verificationResponse = apiCall('https://api.mismatch.io/licensing/verify?licenseKey=' + licenseKey + '&app=merakiApp&email=' + licenseEmail, 'noAPIKeyNeeded').jsonResponse;
   var response = verificationResponse[0];
   if (!response) {
@@ -150,8 +164,16 @@ function getUserInfo() {
       ui.alert('Something\'s wrong with your license.', 'It wasn\'t specifically expired, so it\'s very possible that your license and email don\'t match. Or it\'s possible your key doesn\'t exist. Check them and try again.', ui.ButtonSet.OK);
     }
   }
+    if (muteWarnings == true) {
+      if (!apikey) apikey = 'This value is missing and muteWarnings was set to true.';
+      if (!organizationId) organizationId = 'This value is missing and muteWarnings was set to true.';
+      if (!networkId) networkId = 'This value is missing and muteWarnings was set to true.';
+      if (!securityApplianceSerial) securityApplianceSerial = 'This value is missing and muteWarnings was set to true.';
+      if (!clientTimespan) clientTimespan = 'This value is missing and muteWarnings was set to true.';
+      if (!clientsURL) clientsURL = 'This value is missing and muteWarnings was set to true.';
+    }
     Logger.log('end get user info');
-    return {'apikey':apikey,'organizationId':organizationId,'networkId':networkId,'securityApplianceSerial':securityApplianceSerial,'clientTimespan':clientTimespan,'clientsURL':clientsURL,'licenseValidity':licenseValidity,'licenseMaxClients':licenseMaxClients,'licenseType':response.licenseType};
+    return {'apikey':apikey,'organizationId':organizationId,'networkId':networkId,'securityApplianceSerial':securityApplianceSerial,'clientTimespan':clientTimespan,'clientsURL':clientsURL,'licenseValidity':licenseValidity,'licenseMaxClients':licenseMaxClients,'licenseType':response.licenseType,'shard':shard};
   } catch(e) {
     var payload = {
        "id":"vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk",
@@ -165,7 +187,9 @@ function getUserInfo() {
   }
 }
 /* Using the getUserInfo function:
-Grabs user data from User info sheet. Doesn't require any memberwise inits. */
+Grabs user data from User info sheet. Arguments:
+- sheet: [sheet object, optional] pass in the sheet object to read from. Defaults to the User data sheet of current documtn.
+- muteWarnings: [bool, optional] whether to return missing data and mute ui alerts. Defaults to false.*/
 
 
 function verifyInfoWithUser(dataToVerify, errorIfNotVerified) {
@@ -250,17 +274,25 @@ sheet.clear();
 function getApprovedClients() {
 	try {
       Logger.log('starting approved clients scan');
-	var indexingSheetUrls = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('A2:A' + SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getLastRow()).getValues(); //get the URLs of all the sheets to index for the approved clients list
+  var indexingSheetUrls = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('A2:A' + SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getLastRow()).getValues(); //get the URLs of all the sheets to index for the approved clients list
   var indexingSheetNames = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('B2:B' + SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getLastRow()).getValues(); //get the sheet names of all the sheets to index for the approved clients list
   var indexingSheetFirstCells = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('C2:C' + SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getLastRow()).getValues(); //get the first cells of all the sheets to index for the approved clients list
   var approvedClients = [];
   var approvedTest = [];
-
+  
+  Logger.log(SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('A2:A' + SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getLastRow()).getValues());
+  Logger.log('indexingSheetUrls: ' + indexingSheetUrls);
+  Logger.log('indexingSheetNames: ' + indexingSheetNames);
+  Logger.log('indexingSheetFirstCells: ' + indexingSheetFirstCells);
+  
   for (var i = 0; i < indexingSheetUrls.length; i++) {
     Logger.log("getting approved clients: " + i);
-	var spreadSheet = SpreadsheetApp.openByUrl(indexingSheetUrls[i].join()); //open the i-st spreadsheet
+	var spreadSheet = SpreadsheetApp.openByUrl(indexingSheetUrls[0].join()); //open the i-st spreadsheet
+    Logger.log("1");
     var sheet = spreadSheet.getSheetByName(indexingSheetNames[i].join()); //open the sheet inside of aforementioned spreadsheet
+    Logger.log("2");
     approvedClients = approvedClients.concat(sheet.getRange(indexingSheetFirstCells[i].join() + ':' + indexingSheetFirstCells[i].join().slice(0,1) + spreadSheet.getSheetByName(indexingSheetNames[i]).getLastRow()).getValues()); //add all of the mac addresses on that sheet to the approved clients variable
+    Logger.log("3");
   }
       Logger.log(approvedClients);
       Logger.log('approved clients scan done.');
@@ -274,6 +306,7 @@ function getApprovedClients() {
      "message":e.message,
   };
   apiCallPost('https://api.mismatch.io/analytics/error', payload);
+  Logger.log(payload);
   SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message);
 }
 }
@@ -313,3 +346,15 @@ function initializeSpreadsheet() {
 function logAndUpdateCell(message, cell, sheetName) {
  SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName).getRange(cell).setValue(message);
 }
+
+function getSelection() {
+  var selection = [];
+  var ranges = SpreadsheetApp.getSelection().getActiveRangeList().getRanges();
+  for (var i = 0; i < ranges.length; i++) {
+    selection = selection.concat(ranges[i].getValues());
+    ranges[i]
+  }
+  return selection;
+  return {}
+}
+/* getSelection returns every cell selected by the user whether they used cmd/ctrl click, click and drag or otherwise. It'll return an object with all selection(s).*/

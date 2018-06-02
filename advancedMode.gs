@@ -1,4 +1,4 @@
-//6:19PM, 4/6/18
+//10:30AM, 6/2/18
 function printOrganizations() {
   try {
   var sheet = SpreadsheetApp.getActiveSheet();
@@ -97,7 +97,7 @@ function customAPICall() {
 
   var ui = SpreadsheetApp.getUi();
 
-  var userData = getUserInfo();
+  var userData = getUserInfo(true); //true to mute warnings
   if (userData == 'OK' || userData == 'CLOSE') return;
   var apikey = userData.apikey;
   if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;} //get (^) and verify api key
@@ -134,7 +134,7 @@ function customAPICallPut() {
 
   var ui = SpreadsheetApp.getUi();
 
-  var userData = getUserInfo();
+  var userData = getUserInfo(true);
   if (userData == 'OK' || userData == 'CLOSE') return;
   var apikey = userData.apikey;
   if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;} //get (^) and verify api key

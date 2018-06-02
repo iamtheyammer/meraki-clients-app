@@ -1,4 +1,4 @@
-//7:14AM, 4/6/18
+//10:30AM, 6/2/18
 function onInstall(e) {
  onOpen(e);
  initializeSpreadsheet();
@@ -6,35 +6,35 @@ function onInstall(e) {
 
 function onOpen(e) { //The 'e' there tells the system that this doesn't work in certain authentication modes. Something to look into, but not a priority.
   var ui = SpreadsheetApp.getUi();
-  SpreadsheetApp.getUi().createAddonMenu() //Tells the UI to add a space to put items under the add-ons menu in docs
+  SpreadsheetApp.getUi().createAddonMenu() //Tells the UI to add a space to put items under the add-ons menu in sheets
       .addItem('Start', 'connectToMeraki')
       .addItem('Block remaining clients', 'blockUnknownClients')
       .addItem('Approve remaining clients', 'approveUnknownClients')
+      .addItem('Show individual action sidebar', 'showSidebar')
+      .addSubMenu(ui.createMenu('Get started')
+                  .addItem('Print organizations', 'printOrganizations')
+                  .addItem('Print networks', 'printNetworks')
+                  .addItem('List devices', 'listDevices')
+                  .addItem('Initialize spreadsheet', 'initializeSpreadsheet'))
       .addSeparator()
       .addSubMenu(ui.createMenu('Advanced')
           .addItem('Completely clear sheet', 'completelyClearSheet')
-          .addItem('Get Spreadsheet ID', 'getSpreadsheetId')
-          .addItem('Print organizations', 'printOrganizations')
-          .addItem('Print networks', 'printNetworks')
-          .addItem('Unblock clients on Results sheet', 'unblockClients')
-          .addItem('Initialize spreadsheet', 'initializeSpreadsheet')
+          .addItem('Unblock clients on Results sheet', 'unblockClients') 
                   .addSubMenu(ui.createMenu('Custom API call')
                               .addItem('Custom GET request', 'customAPICall')
                               .addItem('Custom PUT request', 'customAPICallPut')))
-      .addSeparator()
-      .addItem('Make a wish', 'makeAWish')
       .addToUi(); //Completes the add call.
 }
 
 function connectToMeraki() {
   try {
     Logger.log('beginning main');
-  var sheet = SpreadsheetApp.getActiveSheet();
   var ui = SpreadsheetApp.getUi();
   SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Results').activate();
     if (SpreadsheetApp.getActiveSheet().getSheetName() != 'Results') {
-      ui.alert('I can\'t find your Results sheet. Did you rename it?'); 
+      return ui.alert('I can\'t find your Results sheet. Did you rename it?'); 
     }
+  var sheet = SpreadsheetApp.getActiveSheet();
   sheet.clear();
   logAndUpdateCell('Getting data from User data sheet and checking license...', 'A1', 'Results');
   var userData = getUserInfo(); //grab the user's data: see discreetFunctions
@@ -145,7 +145,7 @@ function connectToMeraki() {
     //}
        */
   for (var i = 0; i < unknownClientsLineNum.length; i++) {
-    merakiClientsURL = userData.clientsURL + '#q=' + encodeURIComponent(unknownClients[i]); //set up the URLs: encode the mac address so it's readable by meraki
+    merakiClientsURL = userData.clientsURL + '#c=' + currentClients.jsonResponse[unknownClientsLineNum[i]].id; //set up the URLs: encode the mac address so it's readable by meraki
     unknownClientsPrint.push([currentClients.jsonResponse[unknownClientsLineNum[i]].description, currentClients.jsonResponse[unknownClientsLineNum[i]].mac, currentClients.jsonResponse[unknownClientsLineNum[i]].ip, currentClients.jsonResponse[unknownClientsLineNum[i]].usage.recv/1000 + '/' + currentClients.jsonResponse[unknownClientsLineNum[i]].usage.sent/1000, merakiClientsURL]);
   }
     if (unknownClientsPrint.length >= 1) { //if there are  unknown clients
@@ -287,6 +287,6 @@ function approveUnknownClients() {
   }
 }
 
-function makeAWish() {
+/*function makeAWish() {
   SpreadsheetApp.getUi().alert('Make a wish', 'Help us help you! Click below to make your wish and we\'ll get back to you within 72 hours:\n http://jira.mismatch.io/servicedesk/customer/portal/1 \n (you may have to copy and paste the URL into your address bar)', SpreadsheetApp.getUi().ButtonSet.OK)
-}
+}*/

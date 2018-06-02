@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+    <style>
+      #center {text-align:center;}
+    </style>
+  </head>
+  <body>
+    <div id="center">
+      <h1>MerakiBlocki</h1>
+      <br>
+      <h2>Group policy</h2>
+      <p>Please only select MAC addresses (column B on your results sheet)</p>
+      <button class="action" onclick="google.script.run.selectedMacPolicy('view')">Get policy of selected MAC</button> <br> <br>
+      <button class="action" onclick="google.script.run.selectedMacPolicy('normalize')">Normalize selected MAC</button> <br> <br>
+      <button class="action" onclick="google.script.run.selectedMacPolicy('block')">Block selected MAC</button> <br> <br>
+      <button class="action" onclick="google.script.run.selectedMacPolicy('whitelist')">Whitelist selected MAC</button> <br> <br>
+      <!--<button class="action" onclick="google.script.run.approveSelectedMac()">Approve selected MAC</button> <br> <br>-->
+      <h2>
+    </div>
+  </body>
+</html>
+
+
