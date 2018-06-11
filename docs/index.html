@@ -56,6 +56,8 @@ body {font-size:16px;}
     <p>Block unauthorized clients with ease!</p>
     <p>MerakiBlocki allows you to use Google Sheets to find unauthorized clients on your Meraki network. Give it a list of authorized MAC addresses, and MerakiBlocki will show you data about each client with a MAC that's not on your approved list. You can even block, allow or unblock the unknown clients. MerakiBlocki even includes functions allowing you to make custom Meraki API calls.
     </p>
+	<p>While MerakiBlocki runs inside of Google Sheets right now, that's not the future of MerakiBlocki. We're building a cloud-based dashboard that will be even better. That new cloud-based version will be available for sale. A few months after MerakiBlocki Cloud has the same features (or more) as MerakiBlocki Sheets, we'll begin the deprecation process of MerakiBlocki Sheets. A name change is in the future too.
+	</p>
   </div>
 
   <!-- Install -->
@@ -63,16 +65,18 @@ body {font-size:16px;}
     <h1 class="w3-xxxlarge w3-text-red"><b>Install.</b></h1>
     <hr style="width:50px;border:5px solid red" class="w3-round">
     <p>Installing MerakiBlocki is simple: add it as an add-on in Google Sheets!</p>
-    <p>The add-on is not available to the public yet. Fill out a support ticket <a href="http://jira.mismatch.io/servicedesk/customer/portal/1">here</a> if you'd like to beta test MerakiBlocki. It should be available Summer 2018. If you're a beta tester, the instructions follow: 
+    <p>The add-on is not available to the public yet. Shoot us an email at the bottom of the page if you'd like to give our product a shot. If you're a beta tester already, the instructions follow: 
     </p>
     <ol>
-	<li>Generate a csv of all of your APs and switches with MAC addresses and upload it to Google Sheets. Since it looks for all clients connected to your Security appliance, your APs and switches come up.</li>
+	<li>Install the add-on to google sheets and initialize the sheet.</li>
+	
+	<li>Input your license key and email onto the User data sheet.</li>
+	
+	<li>Go through the Get started menu, and run 'Print organizations' and 'Print networks'. Find and put in the User data sheet your Org ID and your Network ID.</li>
 
-	<li>Generate a list of all of your approved clients, in the form of MAC addresses, formatted like this: 11:22:33:44:55:66 and upload it to google sheets. (if you need to add :'s to your mac addresses, click <a href="https://github.com/iamtheyammer/format-mac-addresses-excel">here</a>.)</li>
+	<li>Run 'List devices', and follow the instructions provided. The, add row B to your approved clients sheet.</li>
 
-	<li>Install the add-on to google sheets.</li>
-
-	<li>Go ahead, initialise the spreadsheet and follow the instructions on the results sheet. Right now, I don't support multiple networks per spreadsheet, so if you need to scan more networks you might need more sheets. (to initialise more spreadsheets, Add-ons, MerakiBlocki, Advanced, Initialise spreadsheet)</li>
+	<li>Go ahead, initialise the spreadsheet and follow the instructions on the results sheet. Right now, I don't support multiple networks per spreadsheet, so if you need to scan more networks you might need more sheets. (to initialise more spreadsheets, Add-ons, MerakiBlocki, Get started, Initialise spreadsheet)</li>
 
 	<li>Head on over to the results sheet, go to Add-ons, MerakiBlocki, Start</li>
 
@@ -92,71 +96,92 @@ body {font-size:16px;}
     <h1 class="w3-xxxlarge w3-text-red"><b>Usage.</b></h1>
     <hr style="width:50px;border:5px solid red" class="w3-round">
     <p>Usage</p>
-    <p>MerakiBlocki has lots of functions that can be used easily by the simplest and the most advanced of users!
+    <p>MerakiBlocki makes it really to pick off unauthorized clients from your network.
     </p>
     
   </div>
 
   <ul>
-<li>Start
-<ul>
-<li>Starts the main function. Only works if there’s text in every yellow box on the User data sheet. It will display all unauthorized clients.</li>
-</ul>
-</li>
-<li>Block remaining clients
-<ul>
-<li>Blocks all MAC addresses listed on the Results sheet.</li>
-</ul>
-</li>
-<li>Approve remaining clients
-<ul>
-<li>Adds all MAC addresses listed on the Results sheet to the first spreadsheet in your Approved clients sheet.</li>
-</ul>
-</li>
-<li>Advanced
-<ul>
-<li>Completely clear sheet
-<ul>
-<li>Just erases your sheet (sheet, not spreadsheet).</li>
-</ul>
-</li>
-<li>Print organisations
-<ul>
-<li>Prints organisations, mainly for finding your Organisation ID.</li>
-</ul>
-</li>
-<li>Print networks
-<ul>
-<li>Prints networks, mainly for finding your Network ID.</li>
-</ul>
-</li>
-<li>Unblock clients on Results sheet
-<ul>
-<li>Sets the policy to ‘normal’ for all MAC addresses listed on the results sheet. Can be used as an undo if you accidentally block all MAC addresses.</li>
-</ul>
-</li>
-<li>Initialize spreadsheet
-<ul>
-<li>Returns the spreadsheet to a brand new state ready to be populated with new data. Erases the entire spreadsheet, be careful!</li>
-</ul>
-</li>
-<li>Custom API call
-<ul>
-<li>Custom GET request
-<ul>
-<li>Enter a Meraki API URL and it will fetch it and display the results.</li>
-</ul>
-</li>
-<li>Custom PUT request
-<ul>
-<li>Enter a Meraki API URL (with params) and it will PUT it, and display the result.</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
+	  <li>Start
+		  <ul>
+			  <li>Starts the main function. Only works if there’s text in every yellow box on the User data sheet. It will display all unauthorized clients.</li>
+		  </ul>
+	</li>
+	<li>Block remaining clients
+		<ul>
+			<li>Blocks all MAC addresses listed on the Results sheet.</li>
+		</ul>
+	</li>
+	<li>Approve remaining clients
+		<ul>
+			<li>Adds all MAC addresses listed on the Results sheet to the first spreadsheet in your Approved clients sheet.</li>
+		</ul>
+	</li>
+	<li>Show individual action sidebar</li>
+	<ul>
+		<li>This opens the sidebar allowing you to select one or more MAC address(es) and either view the group policy, normalize, whitelist or block the client.</li>
+	</ul>
+	<li>Get started
+		<ul>
+			<li>Print organisations</li>
+				<ul>
+					<li>Prints organisations, mainly for finding your Organisation ID.</li>
+				</ul>
+		
+			<li>Print networks</li>
+			<ul>
+				<li>Prints networks, mainly for finding your Network ID</li>
+			</ul>
+			
+			<li>List devices</li>
+			<ul>
+				<li>Begins the process of making a list containing information about your Meraki devices for your Approved Clients sheet.</li>
+			</ul>	
+			
+			<li>Initialize spreadsheet</li>
+			<ul>
+				<li>Returns the spreadsheet to a brand new state ready to be populated with new data. Erases the entire spreadsheet, be careful!</li>
+			</ul>
+		</ul>		
+		
+	</li>
+	<li>Advanced
+		<ul>
+			<li>Completely clear sheet
+				<ul>
+					<li>Just erases your sheet (sheet, not spreadsheet).</li>
+				</ul>
+			</li>
+			
+			<li>Print networks
+			<ul>
+				<li>Prints networks, mainly for finding your Network ID.</li>
+			</ul>
+			</li>
+			<li>Unblock clients on Results sheet
+			<ul>
+				<li>Sets the policy to ‘normal’ for all MAC addresses listed on the results sheet. Can be used as an undo if you accidentally block all MAC addresses.</li>
+			</ul>
+		</li>
+		</ul>
+	</li>
+	<li>Custom API call
+		<ul>
+			<li>Custom GET request
+				<ul>
+					<li>Enter a Meraki API URL and it will fetch it and display the results.</li>
+	</ul>
+	</li>
+	<li>Custom PUT request
+		<ul>
+			<li>Enter a Meraki API URL (with params) and it will PUT it, and display the result.</li>
+		</ul>
+	</li>
+	</ul>
+	</li>
+	</ul>
+	</li>
+	</ul>
 
 <!-- Pricing -->
   <div class="w3-container" id="pricing" style="margin-top:75px">
@@ -165,7 +190,7 @@ body {font-size:16px;}
     <p>MerakiBlocki is currently in a free beta.</p>
     <p>Eventually, a license key will be required to use MerakiBlocki. We haven't decided whether MerakiBlocki will be charged based on usage or monthly, but a free trial will most likely be available. For more information, sign up for occasional emails <a href="#emails" onclick="w3_close()" class="">here</a>.
     </p>
-	<p>If you'd like to beta test MerakiBlocki, fill out a support ticket <a href="http://jira.mismatch.io/servicedesk/customer/portal/1">here</a>.</p>
+	<p>If you'd like to beta test MerakiBlocki, shoot us an email at the bottom of the page.</p>
   </div>
 	
  <!-- Privacy -->
@@ -174,7 +199,8 @@ body {font-size:16px;}
     <hr style="width:50px;border:5px solid red" class="w3-round">
     <p>MerakiBlocki sends analytics and errors to mismatch.io, the developers.</p>
     <p>MerakiBlocki sends the function ran to mismatch.io when a function is ran from the menu. It has no personal data at all. If you encounter an error, MerakiBlocki will send the error text, file name and line number in which the error occured. All analytics/error reporting is done over SSL/TLS and the information is only for my curiosity and bug fixing. It will never be sold or given to anyone.
-    </p>
+	</p>
+	<p>In the future, MerakiBlocki will send more personalized analytics, including who ran which function at what time, whether you hit the license client limit (we will not send the number of clients on your network), and more info, which we will announce before we roll it out. The personalized analytics will be used to help us figure out which features you use, how often you use them and how we can make MerakiBlocki better. With this, we'll be able to provide you with emails helping you get the most out of MerakiBlocki.</p>
   </div>
   
   <!-- Packages / Pricing Tables
