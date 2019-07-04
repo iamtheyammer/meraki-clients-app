@@ -1,4 +1,4 @@
-//10:30AM, 6/2/18
+//12:05AM, 7/4/19
 function showSidebar() {
   var ui = HtmlService.createHtmlOutputFromFile('Sidebar')
    .setTitle('MerakiBlocki - Individual Actions');
@@ -64,7 +64,10 @@ function selectedMacPolicy(action) {
     */} else {
         sheet.getRange('F' + j).setValue(response.jsonResponse.type);
         Utilities.sleep(220); //to comply with Meraki's 5 calls/sec limit.
-      }
+          if(action != 'view') {
+          selectedMacPolicy('view');  
+        }
+    }
     }
   }
   //to here is code with an interesting story. read it here: https://gist.github.com/iamtheyammer/38cf6ffb1a059ce8718269a283b47f9a

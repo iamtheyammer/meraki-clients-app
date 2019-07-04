@@ -1,4 +1,4 @@
-//3:20PM, 6/2/18
+//12:05AM, 7/4/19
 /* This is the discreetFunctions code sheet. It's for functions that take in and put out data, like small processors. It's not for the main code flow. */
 
 function apiCall(url, apikey) {
@@ -74,8 +74,10 @@ function getUserInfo(muteWarnings, sheet) {
   //find user organization
   if (!muteWarnings) var muteWarnings = false; //if it wasn't passed in, default to false
   if (!sheet) var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('User data'); //if sheet isn't passed in, get it
-  if (!sheet) return ui.alert('Can\'t find User data sheet.', 'Please make sure you initialised your sheet. Try going to Add-ons, MerakiBlocki, Advanced, Initialize spreadsheet.', ui.ButtonSet.OK);
-    
+  if (!sheet || sheet == null) {
+    return ui.alert('Can\'t find User data sheet.', 'Please make sure you initialised your sheet. Try going to Add-ons, MerakiBlocki, Advanced, Initialize spreadsheet.', ui.ButtonSet.OK);
+  }
+  Logger.log('getUserInfo() is running with muteWarnings set to ' + muteWarnings + ' and using the sheet with ID ' + sheet.getSheetId() + '.');
   if (!sheet.getRange('A2').getDisplayValue()) {
   	return ui.alert('Your API key is missing.', 'Please check your User data sheet. If there\'s no User data sheet, try initializing your sheet from Add-ons, MerakiBlocki, Get started, Initialize spreadsheet', ui.ButtonSet.OK);
   } else {
@@ -273,7 +275,67 @@ sheet.clear();
 
 function getApprovedClients() {
 	try {
-      Logger.log('starting approved clients scan');
+      var ui = SpreadsheetApp.getUi();
+      if (!SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients cache')) {
+        var response = ui.alert('Do you want to use a cache?', 'We can cache Approved clients to improve speed when running the main function. You will need to update the cache when you modify an Approved Clients sheet or add/delete one. Press OK to use a cache by default, or press cancel to rebuild the list by default. The X at the top right cancels this function.', ui.ButtonSet.OK_CANCEL);
+        if(response === ui.Button.CANCEL || response === ui.Button.CLOSE) return;
+        Logger.log('starting approved clients scan');
+        var indexingSheetUrls = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('A2:A' + SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getLastRow()).getValues(); //get the URLs of all the sheets to index for the approved clients list
+        var indexingSheetNames = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('B2:B' + SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getLastRow()).getValues(); //get the sheet names of all the sheets to index for the approved clients list
+        var indexingSheetFirstCells = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('C2:C' + SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getLastRow()).getValues(); //get the first cells of all the sheets to index for the approved clients list
+        var approvedClients = [];
+        var approvedTest = [];
+  
+        Logger.log(SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('A2:A' + SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getLastRow()).getValues());
+        Logger.log('indexingSheetUrls: ' + indexingSheetUrls);
+        Logger.log('indexingSheetNames: ' + indexingSheetNames);
+        Logger.log('indexingSheetFirstCells: ' + indexingSheetFirstCells);
+  
+        for (var i = 0; i < indexingSheetUrls.length; i++) {
+          Logger.log("getting approved clients: " + i);
+          if(!indexingSheetUrls[i]) continue;
+          Logger.log('indexingSheetUrls[i].join()' + indexingSheetUrls[i]);
+          var spreadSheet = SpreadsheetApp.openByUrl(indexingSheetUrls[i].join()); //open the i-st spreadsheet
+          Logger.log("1");
+          var sheet = spreadSheet.getSheetByName(indexingSheetNames[i].join()); //open the sheet inside of aforementioned spreadsheet
+          Logger.log("2");
+          //var string = indexingSheetFirstCells[i].join() + ':' + indexingSheetFirstCells[i].join().slice(0,1) + spreadSheet.getSheetByName(indexingSheetNames[i]).getLastRow();
+          approvedClients = approvedClients.concat(sheet.getRange(indexingSheetFirstCells[i].join() + ':' + indexingSheetFirstCells[i].join().slice(0,1) + spreadSheet.getSheetByName(indexingSheetNames[i]).getLastRow()).getValues()); //add all of the mac addresses on that sheet to the approved clients variable
+          Logger.log("3");
+          //return approvedClients;
+        }
+        Logger.log(approvedClients);
+        var final = [];
+        for(var i = 0; i < approvedClients.length; i++) {
+          for(var j = 0; j < approvedClients[i].length; j++) final.push(approvedClients[i][j]);
+        }
+        SpreadsheetApp.getActiveSpreadsheet().insertSheet('Approved clients cache').getRange(1, 1).setValue(JSON.stringify(final));
+        SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients cache').getRange(1, 2).setValue('Cell A1 in this sheet holds your Approved clients cache. Do not modify that cell. To update the cache, run Update allowed clients cache in the advanced menu.');
+      } else if (SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients cache')) {
+        return JSON.parse(SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients cache').getRange(1,1).getValue()); // pull approved clients from the cache.
+      }
+      Logger.log('approved clients scan done.');
+  //return approvedClients; //retunr our final product
+} catch(e) { //I feel like this script might have a high chance for error, so I better add proper error reporting.
+  var payload = {
+     "id":"vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk",
+     "function":"getApprovedClients",
+     "fileName":e.fileName,
+     "lineNumber":e.lineNumber,
+     "message":e.message,
+  };
+  apiCallPost('https://api.mismatch.io/analytics/error', payload);
+  Logger.log(payload);
+  SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message);
+}
+}
+
+function refreshApprovedClients() {
+  var ui = SpreadsheetApp.getUi();
+  if (!SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients cache')) {
+    return ui.alert('No cache delected', 'If you\'re sure you\'ve got a cache, delete the Approved clients cache sheet. To make a cache, run the main function.', ui.ButtonSet.OK);
+  }
+  Logger.log('starting approved clients scan');
   var indexingSheetUrls = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('A2:A' + SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getLastRow()).getValues(); //get the URLs of all the sheets to index for the approved clients list
   var indexingSheetNames = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('B2:B' + SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getLastRow()).getValues(); //get the sheet names of all the sheets to index for the approved clients list
   var indexingSheetFirstCells = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getRange('C2:C' + SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients').getLastRow()).getValues(); //get the first cells of all the sheets to index for the approved clients list
@@ -287,29 +349,27 @@ function getApprovedClients() {
   
   for (var i = 0; i < indexingSheetUrls.length; i++) {
     Logger.log("getting approved clients: " + i);
-	var spreadSheet = SpreadsheetApp.openByUrl(indexingSheetUrls[i].join()); //open the i-st spreadsheet
+    if(!indexingSheetUrls[i]) continue;
+    Logger.log('indexingSheetUrls[i].join()' + indexingSheetUrls[i]);
+    var spreadSheet = SpreadsheetApp.openByUrl(indexingSheetUrls[i].join()); //open the i-st spreadsheet
     Logger.log("1");
     var sheet = spreadSheet.getSheetByName(indexingSheetNames[i].join()); //open the sheet inside of aforementioned spreadsheet
     Logger.log("2");
     //var string = indexingSheetFirstCells[i].join() + ':' + indexingSheetFirstCells[i].join().slice(0,1) + spreadSheet.getSheetByName(indexingSheetNames[i]).getLastRow();
     approvedClients = approvedClients.concat(sheet.getRange(indexingSheetFirstCells[i].join() + ':' + indexingSheetFirstCells[i].join().slice(0,1) + spreadSheet.getSheetByName(indexingSheetNames[i]).getLastRow()).getValues()); //add all of the mac addresses on that sheet to the approved clients variable
     Logger.log("3");
+    //return approvedClients;
   }
-      Logger.log(approvedClients);
-      Logger.log('approved clients scan done.');
-  return approvedClients; //retunr our final product
-} catch(e) { //I feel like this script might have a high chance for error, so I better add proper error reporting.
-  var payload = {
-     "id":"vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk",
-     "function":"getApprovedClients",
-     "fileName":e.fileName,
-     "lineNumber":e.lineNumber,
-     "message":e.message,
-  };
-  apiCallPost('https://api.mismatch.io/analytics/error', payload);
-  Logger.log(payload);
-  SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message);
-}
+  Logger.log(approvedClients);
+  var final = [];
+  for(var i = 0; i < approvedClients.length; i++) {
+    for(var j = 0; j < approvedClients[i].length; j++) final.push(approvedClients[i][j]);
+  }
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients cache').getRange(1, 1).setValue(JSON.stringify(final));
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients cache').getRange(1, 2).setValue('Cell A1 in this sheet holds your Approved clients cache. Do not modify that cell. To update the cache, run Update allowed clients cache in the advanced menu.');
+  if (SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Approved clients cache').getRange(1,1).getValue() === JSON.stringify(final)) {
+    return ui.alert('Success!', 'Successfully updated your Approved clients cache.', ui.ButtonSet.OK);
+  }
 }
 //[[ [MAC], [MAC], [MAC] ]]
 

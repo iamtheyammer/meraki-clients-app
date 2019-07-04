@@ -1,4 +1,4 @@
-//10:30AM, 6/2/18
+//12:05AM, 7/4/19
 function onInstall(e) {
  onOpen(e);
  initializeSpreadsheet();
@@ -19,7 +19,8 @@ function onOpen(e) { //The 'e' there tells the system that this doesn't work in 
       .addSeparator()
       .addSubMenu(ui.createMenu('Advanced')
           .addItem('Completely clear sheet', 'completelyClearSheet')
-          .addItem('Unblock clients on Results sheet', 'unblockClients') 
+          .addItem('Unblock clients on Results sheet', 'unblockClients')
+          .addItem('Refresh Approved clients cache', 'refreshApprovedClients')
                   .addSubMenu(ui.createMenu('Custom API call')
                               .addItem('Custom GET request', 'customAPICall')
                               .addItem('Custom PUT request', 'customAPICallPut')))
@@ -71,12 +72,11 @@ function connectToMeraki() {
   var currentClients = currentClients; //gets the clients that are currently connected.
   sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Approved clients");
   logAndUpdateCell('Getting approved clients...', 'A1', 'Results');
-  var approvedClientsResponse = getApprovedClients();
-  var approvedClients = JSON.stringify(approvedClientsResponse);
+  var approvedClients = getApprovedClients();
   sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Results");
-  var unknownClients = new Array(); //this is the array that will hold the MAC addresses for clients we haven't approved
+  var unknownClients = []; //this is the array that will hold the MAC addresses for clients we haven't approved
   var unknownClientsPrint = []; //this is the array that will be printed to the Results sheet
-  var unknownClientsLineNum = new Array(); //this is the array that will hold the line numbers of the clients that aren't approved so we can get more info about each unknown client without another API call
+  var unknownClientsLineNum = []; //this is the array that will hold the line numbers of the clients that aren't approved so we can get more info about each unknown client without another API call
 
   var numberOfUnknownDevices = 0; //assume that there are no unknown devices
   if (userData.licenseMaxClients != 0) var remainingLicenseClients = userData.licenseMaxClients; //ignore if unlimited license
@@ -86,8 +86,8 @@ function connectToMeraki() {
     var row = currentClients.jsonResponse[i].mac; //set the row to a mac address
     var duplicate = false; //assume every row is not a duplicate
     if (remainingLicenseClients < 1) {var notAllClientsPrinted = true; break;} else {remainingLicenseClients -= 1;}
-    for(j in approvedClientsResponse){
-      if(row == approvedClientsResponse[j]){ //if the row matches an entry on the approved clients list.
+    for(j in approvedClients){
+      if(row == approvedClients[j]){ //if the row matches an entry on the approved clients list.
         duplicate = true; //mark it as a duplicate
       }
     }
