@@ -105,13 +105,9 @@ function getUserInfo(muteWarnings, sheet) {
   var clientsURL = range.getDisplayValue();
   if (!clientsURL && muteWarnings == false) return ui.alert('Your Meraki Dashboard link is missing.', 'Please check your User data sheet. If there\'s no User data sheet, try initializing your sheet from Add-ons, MerakiBlocki, Get started, Initialize spreadsheet', ui.ButtonSet.OK);
 
-  var range = sheet.getRange('G2'); //grabs user license Key
-  var licenseKey = range.getDisplayValue();
-  if (!licenseKey && muteWarnings == false) return ui.alert('Your license key is missing.', 'Please check your User data sheet. If there\'s no User data sheet, try initializing your sheet from Add-ons, MerakiBlocki, Get started, Initialize spreadsheet', ui.ButtonSet.OK);
+  var licenseKey = 'no longer needed :)';
   
-  var range = sheet.getRange('H2'); //grabs user license email
-  var licenseEmail = range.getDisplayValue();
-  if (!licenseEmail && muteWarnings == false) return ui.alert('Your license email is missing.', 'Please check your User data sheet. If there\'s no User data sheet, try initializing your sheet from Add-ons, MerakiBlocki, Get started, Initialize spreadsheet', ui.ButtonSet.OK);
+  var licenseEmail = 'also no longer needed :)';
   
   var shard = clientsURL.slice(8, clientsURL.indexOf('.')); //calculates the shard from your clients URL
     
