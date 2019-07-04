@@ -165,7 +165,6 @@ function getUserInfo(muteWarnings, sheet) {
   //     SpreadsheetApp.getActiveSpreadsheet().getSheetByName('User data').getRange("G3").setValue('Invalid license.');
   //     ui.alert('Something\'s wrong with your license.', 'It wasn\'t specifically expired, so it\'s very possible that your license and email don\'t match. Or it\'s possible your key doesn\'t exist. Check them and try again.', ui.ButtonSet.OK);
   //   }
-  }
     if (muteWarnings == true) {
       if (!apikey) apikey = 'This value is missing and muteWarnings was set to true.';
       if (!organizationId) organizationId = 'This value is missing and muteWarnings was set to true.';
@@ -177,7 +176,7 @@ function getUserInfo(muteWarnings, sheet) {
 
     // bypass licensing-- everyone's unlimited :)
     var licenseValidity = true;
-    var licenseMaxClients = -1;
+    var licenseMaxClients = 0;
     var licenseType = 'unlimited';
 
     Logger.log('end get user info');
