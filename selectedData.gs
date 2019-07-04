@@ -1,4 +1,4 @@
-//12:05AM, 7/4/19
+//12:42AM, 7/4/19
 function showSidebar() {
   var ui = HtmlService.createHtmlOutputFromFile('Sidebar')
    .setTitle('MerakiBlocki - Individual Actions');

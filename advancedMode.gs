@@ -1,4 +1,4 @@
-//12:05AM, 7/4/19
+//12:42AM, 7/4/19
 function customAPICall() {
 
   var ui = SpreadsheetApp.getUi();
@@ -13,9 +13,6 @@ function customAPICall() {
     ui.alert('Insufficient license', 'Your current license does not support custom API requests. Please upgrade at merakiblocki.com and try again.', ui.ButtonSet.OK);
     return;
   }
-
-  apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=customAPICall', 'noApiKeyNeeded'); //analytics
-
 
   var response = ui.prompt('What is the URL you want to fetch?', 'Enter the entire URL, including https:// and the domain.', ui.ButtonSet.OK_CANCEL); //ask user for url
   if (response.getSelectedButton() !== ui.Button.OK) {
@@ -50,9 +47,7 @@ function customAPICallPut() {
     ui.alert('Insufficient license', 'Your current license does not support custom API requests. Please upgrade at merakiblocki.com and try again.', ui.ButtonSet.OK);
     return;
   }
-
-    apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=customAPICallPut', 'noApiKeyNeeded'); //analytics
-
+  
   var response = ui.prompt('What is the URL you want to fetch?', 'Enter the entire URL, including https:// and the domain.', ui.ButtonSet.OK_CANCEL); //ask user for url
   if (response.getSelectedButton() !== ui.Button.OK) {
    ui.alert('The user chose to close the dialog.');
@@ -78,8 +73,6 @@ function unblockClients() {
   var ui = SpreadsheetApp.getUi();
   var cell;
   var range;
-
-  apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=unblockClients', 'noApiKeyNeeded'); //analytics
 
   var userData = getUserInfo();
   if (userData == 'OK' || userData == 'CLOSE') return;
@@ -110,19 +103,10 @@ function unblockClients() {
   Utilities.sleep(400); //wait 400 milliseconds to comply with meraki's 5 calls/second limit
   }
   } catch(e) {
-    var payload = {
-       "id":"vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk",
-       "function":"connectToMeraki",
-       "fileName":e.fileName,
-       "lineNumber":e.lineNumber,
-       "message":e.message,
-    };
-    apiCallPost('https://api.mismatch.io/analytics/error', payload);
-    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message);
+    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. Here\'s the full error: ' + e.message);
   }
 }
 
 function completelyClearSheet() {
- apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=completelyClearSheet', 'noApiKeyNeeded'); //analytics
  SpreadsheetApp.getActiveSheet().clear();
 }

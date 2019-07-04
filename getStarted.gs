@@ -1,4 +1,4 @@
-//12:05AM, 7/4/19
+//12:42AM, 7/4/19
 function printOrganizations() {
   try {
     var sheet = SpreadsheetApp.getActiveSheet();
@@ -6,8 +6,6 @@ function printOrganizations() {
     var cell;
     var range;
     
-    apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=printOrganizations', 'noApiKeyNeeded'); //analytics
-
     var userData = getUserInfo(true); //true to mute warnings
     Logger.log(userData);
     if (userData == 'OK' || userData == 'CLOSE') return;
@@ -47,15 +45,7 @@ function printOrganizations() {
       }
     }
   } catch(e) {
-    var payload = {
-       "id":"vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk",
-       "function":"printOrganizations",
-       "fileName":e.fileName,
-       "lineNumber":e.lineNumber,
-       "message":e.message,
-    };
-    //apiCallPost('https://api.mismatch.io/analytics/error', payload);
-    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message);
+    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. Here\'s the full error: ' + e.message);
 
   }
 }
@@ -68,8 +58,6 @@ function printNetworks() {
   var ui = SpreadsheetApp.getUi();
   var cell;
   var range;
-
-  apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=printNetworks', 'noApiKeyNeeded'); //analytics
 
   var userData = getUserInfo(true); //true to mute warnings
   if (userData == 'OK' || userData == 'CLOSE') return;
@@ -97,15 +85,7 @@ function printNetworks() {
     cell.setValues([[networkList.jsonResponse[i].name, networkList.jsonResponse[i].id]]);
   }
   } catch(e) {
-    var payload = {
-       "id":"vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk",
-       "function":"printNetworks",
-       "fileName":e.fileName,
-       "lineNumber":e.lineNumber,
-       "message":e.message,
-    };
-    apiCallPost('https://api.mismatch.io/analytics/error', payload);
-    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message);
+    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. Here\'s the full error: ' + e.message);
   }
 }
 

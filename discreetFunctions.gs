@@ -1,4 +1,4 @@
-//12:05AM, 7/4/19
+//12:42AM, 7/4/19
 /* This is the discreetFunctions code sheet. It's for functions that take in and put out data, like small processors. It's not for the main code flow. */
 
 function apiCall(url, apikey) {
@@ -127,44 +127,44 @@ function getUserInfo(muteWarnings, sheet) {
     }
   }
     
-  var verificationResponse = apiCall('https://api.mismatch.io/licensing/verify?licenseKey=' + licenseKey + '&app=merakiApp&email=' + licenseEmail, 'noAPIKeyNeeded').jsonResponse;
-  var response = verificationResponse[0];
-  if (!response) {
-      Logger.log(verificationResponse.licenseType);
-      Logger.log(verificationResponse.email);
-      var licenseValidity = false;
-      var licenseMaxClients = -2;
-      SpreadsheetApp.getActiveSpreadsheet().getSheetByName('User data').getRange("G3").setValue('Invalid license.');
-      return ui.alert('Invalid license.', verificationResponse.message, ui.ButtonSet.OK);
-  } else {
-    if (response.licenseType == 'basic' && response.email == licenseEmail) {
-      var licenseValidity = true;
-      var licenseMaxClients = response.licenseMaxClients;
-      SpreadsheetApp.getActiveSpreadsheet().getSheetByName('User data').getRange("G3").setValue('Valid - ' + response.licenseType + ' license. Thank you for playing fair.');
-      Logger.log('BASIC LICENSE');
-    } else if (response.licenseType == 'pro' && response.email == licenseEmail) {
-      var licenseValidity = true;
-      var licenseMaxClients = response.licenseMaxClients;
-      Logger.log('PRO LICENSE');
-      SpreadsheetApp.getActiveSpreadsheet().getSheetByName('User data').getRange("G3").setValue('Valid - ' + response.licenseType + ' license. Thank you for playing fair.');
-    } else if (response.licenseType == 'unlimited' && response.email == licenseEmail) {
-      var licenseValidity = true;
-      var licenseMaxClients = response.licenseMaxClients;
-      SpreadsheetApp.getActiveSpreadsheet().getSheetByName('User data').getRange("G3").setValue('Valid - ' + response.licenseType + ' license. Thank you for playing fair.');
-      Logger.log('UNLIMITED LICENSE');
-    } else if (response.licenseType == 'expired') {
-      var licenseValidity = false;
-      var licenseMaxClients = -1;
-      SpreadsheetApp.getActiveSpreadsheet().getSheetByName('User data').getRange("G3").setValue('Expired license.');
-      Logger.log('EXPIRED LICENSE');
-    } else {
-      //Logger.log(response.licenseType);
-      //Logger.log(response.email);
-      var licenseValidity = false;
-      var licenseMaxClients = -2;
-      SpreadsheetApp.getActiveSpreadsheet().getSheetByName('User data').getRange("G3").setValue('Invalid license.');
-      ui.alert('Something\'s wrong with your license.', 'It wasn\'t specifically expired, so it\'s very possible that your license and email don\'t match. Or it\'s possible your key doesn\'t exist. Check them and try again.', ui.ButtonSet.OK);
-    }
+  // var verificationResponse = apiCall('https://api.mismatch.io/licensing/verify?licenseKey=' + licenseKey + '&app=merakiApp&email=' + licenseEmail, 'noAPIKeyNeeded').jsonResponse;
+  // var response = verificationResponse[0];
+  // if (!response) {
+  //     Logger.log(verificationResponse.licenseType);
+  //     Logger.log(verificationResponse.email);
+  //     var licenseValidity = false;
+  //     var licenseMaxClients = -2;
+  //     SpreadsheetApp.getActiveSpreadsheet().getSheetByName('User data').getRange("G3").setValue('Invalid license.');
+  //     return ui.alert('Invalid license.', verificationResponse.message, ui.ButtonSet.OK);
+  // } else {
+  //   if (response.licenseType == 'basic' && response.email == licenseEmail) {
+  //     var licenseValidity = true;
+  //     var licenseMaxClients = response.licenseMaxClients;
+  //     SpreadsheetApp.getActiveSpreadsheet().getSheetByName('User data').getRange("G3").setValue('Valid - ' + response.licenseType + ' license. Thank you for playing fair.');
+  //     Logger.log('BASIC LICENSE');
+  //   } else if (response.licenseType == 'pro' && response.email == licenseEmail) {
+  //     var licenseValidity = true;
+  //     var licenseMaxClients = response.licenseMaxClients;
+  //     Logger.log('PRO LICENSE');
+  //     SpreadsheetApp.getActiveSpreadsheet().getSheetByName('User data').getRange("G3").setValue('Valid - ' + response.licenseType + ' license. Thank you for playing fair.');
+  //   } else if (response.licenseType == 'unlimited' && response.email == licenseEmail) {
+  //     var licenseValidity = true;
+  //     var licenseMaxClients = response.licenseMaxClients;
+  //     SpreadsheetApp.getActiveSpreadsheet().getSheetByName('User data').getRange("G3").setValue('Valid - ' + response.licenseType + ' license. Thank you for playing fair.');
+  //     Logger.log('UNLIMITED LICENSE');
+  //   } else if (response.licenseType == 'expired') {
+  //     var licenseValidity = false;
+  //     var licenseMaxClients = -1;
+  //     SpreadsheetApp.getActiveSpreadsheet().getSheetByName('User data').getRange("G3").setValue('Expired license.');
+  //     Logger.log('EXPIRED LICENSE');
+  //   } else {
+  //     //Logger.log(response.licenseType);
+  //     //Logger.log(response.email);
+  //     var licenseValidity = false;
+  //     var licenseMaxClients = -2;
+  //     SpreadsheetApp.getActiveSpreadsheet().getSheetByName('User data').getRange("G3").setValue('Invalid license.');
+  //     ui.alert('Something\'s wrong with your license.', 'It wasn\'t specifically expired, so it\'s very possible that your license and email don\'t match. Or it\'s possible your key doesn\'t exist. Check them and try again.', ui.ButtonSet.OK);
+  //   }
   }
     if (muteWarnings == true) {
       if (!apikey) apikey = 'This value is missing and muteWarnings was set to true.';
@@ -174,18 +174,16 @@ function getUserInfo(muteWarnings, sheet) {
       if (!clientTimespan) clientTimespan = 'This value is missing and muteWarnings was set to true.';
       if (!clientsURL) clientsURL = 'This value is missing and muteWarnings was set to true.';
     }
+
+    // bypass licensing-- everyone's unlimited :)
+    var licenseValidity = true;
+    var licenseMaxClients = -1;
+    var licenseType = 'unlimited';
+
     Logger.log('end get user info');
-    return {'apikey':apikey,'organizationId':organizationId,'networkId':networkId,'securityApplianceSerial':securityApplianceSerial,'clientTimespan':clientTimespan,'clientsURL':clientsURL,'licenseValidity':licenseValidity,'licenseMaxClients':licenseMaxClients,'licenseType':response.licenseType,'shard':shard};
+    return {'apikey':apikey,'organizationId':organizationId,'networkId':networkId,'securityApplianceSerial':securityApplianceSerial,'clientTimespan':clientTimespan,'clientsURL':clientsURL,'licenseValidity':licenseValidity,'licenseMaxClients':licenseMaxClients,'licenseType':licenseType,'shard':shard};
   } catch(e) {
-    var payload = {
-       "id":"vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk",
-       "function":"getUserInfo",
-       "fileName":e.fileName,
-       "lineNumber":e.lineNumber,
-       "message":e.message,
-    };
-    apiCallPost('https://api.mismatch.io/analytics/error', payload);
-    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message);
+    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. Here\'s the full error: ' + e.message);
   }
 }
 /* Using the getUserInfo function:
@@ -204,15 +202,7 @@ function verifyInfoWithUser(dataToVerify, errorIfNotVerified) {
   }
   Logger.log(dataToVerify + ' has been verified.');
   } catch(e) {
-    var payload = {
-       "id":"vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk",
-       "function":"connectToMeraki",
-       "fileName":e.fileName,
-       "lineNumber":e.lineNumber,
-       "message":e.message,
-    };
-    apiCallPost('https://api.mismatch.io/analytics/error', payload);
-    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message);
+    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. Here\'s the full error: ' + e.message);
   }
 }
 /* Using the verifyInfoWithUser function:
@@ -253,15 +243,7 @@ function switchSheets(sheetName) {
   return newSheet;
   //newSheet.activate();
  } catch(e) {
-    var payload = {
-       "id":"vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk",
-       "function":"connectToMeraki",
-       "fileName":e.fileName,
-       "lineNumber":e.lineNumber,
-       "message":e.message,
-    };
-    apiCallPost('https://api.mismatch.io/analytics/error', payload);
-    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message);
+    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. Here\'s the full error: ' + e.message);
   }
 }
 
@@ -317,16 +299,7 @@ function getApprovedClients() {
       Logger.log('approved clients scan done.');
   //return approvedClients; //retunr our final product
 } catch(e) { //I feel like this script might have a high chance for error, so I better add proper error reporting.
-  var payload = {
-     "id":"vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk",
-     "function":"getApprovedClients",
-     "fileName":e.fileName,
-     "lineNumber":e.lineNumber,
-     "message":e.message,
-  };
-  apiCallPost('https://api.mismatch.io/analytics/error', payload);
-  Logger.log(payload);
-  SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message);
+  SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. Here\'s the full error: ' + e.message);
 }
 }
 

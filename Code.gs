@@ -1,4 +1,4 @@
-//12:05AM, 7/4/19
+//12:42AM, 7/4/19
 function onInstall(e) {
  onOpen(e);
  initializeSpreadsheet();
@@ -51,7 +51,6 @@ function connectToMeraki() {
     }
 
   logAndUpdateCell('Reporting analytics...', 'A1', 'Results');
-  apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=connectToMeraki', 'noApiKeyNeeded'); //analytics
   
   var merakiOrganizationId = userData.organizationId;
   var merakiClientsURL;
@@ -168,15 +167,7 @@ function connectToMeraki() {
     }
     Logger.log('main function done');
   } catch(e) {
-    var payload = {
-       "id":"vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk",
-       "function":"connectToMeraki",
-       "fileName":e.fileName,
-       "lineNumber":e.lineNumber,
-       "message":e.message,
-    };
-    apiCallPost('https://api.mismatch.io/analytics/error', payload);
-    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message);
+    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. Here\'s the full error: ' + e.message);
   }
 }
 
@@ -188,8 +179,6 @@ function blockUnknownClients() {
   var range;
   var userData = getUserInfo();
   if (userData == 'OK' || userData == 'CLOSE') return;
-
-  apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=blockUnknownClients', 'noApiKeyNeeded'); //analytics
 
   var apikey = userData.apikey;
   if (apikey.length <= 20) {ui.alert('Your API key is missing or too short.'); return;}
@@ -215,15 +204,7 @@ function blockUnknownClients() {
   }
 
   } catch(e) {
-    var payload = {
-       "id":"vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk",
-       "function":"blockUnknownClients",
-       "fileName":e.fileName,
-       "lineNumber":e.lineNumber,
-       "message":e.message,
-    };
-    apiCallPost('https://api.mismatch.io/analytics/error', payload);
-    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message);
+    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. Here\'s the full error: ' + e.message);
   }
 }
 
@@ -234,8 +215,6 @@ function approveUnknownClients() {
   var userData = getUserInfo();
   if (userData == 'OK' || userData == 'CLOSE') return;
   try {
-  apiCallPut('https://api.mismatch.io/analytics?id=vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk&function=approveUnknownClients', 'noApiKeyNeeded'); //analytics
-
   sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Results").activate(); //visually switch sheets to Results
   var unknownClients = sheet.getRange('B2:B' + sheet.getLastRow()).getValues(); //grab the mac addresses
 
@@ -275,15 +254,7 @@ function approveUnknownClients() {
   sheet.getRange(1, 1, newData.length, newData[0].length).setValues(newData); //above code (whole paragraph) finds and removes duplicates in the approved clients list
 
   } catch(e) {
-    var payload = {
-       "id":"vGWK3gnQozAAjuCkU9ni7jH93yCutPRfsnU6HtaAn66gq4ekRtwGk9zTTYXgbbAk",
-       "function":"approveUnknownClients",
-       "fileName":e.fileName,
-       "lineNumber":e.lineNumber,
-       "message":e.message,
-    };
-    apiCallPost('https://api.mismatch.io/analytics/error', payload);
-    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. ' + 'I\'ve reported this to the developers. Here\'s the full error: ' + e.message);
+    SpreadsheetApp.getUi().alert('I\'m sorry, something didn\'t work right. Here\'s the full error: ' + e.message);
   }
 }
 
